@@ -50,3 +50,19 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Microchip Studio files
+*.atsuo
+*.lss
+*.srec
+.atsuo
+.atsuo.orig
+.vs/
+*.ipch
+*.log
+*.filters
+*.users
+*.user
+*.eep
+*.componentinfo.xml
+Debug/
