@@ -5,7 +5,7 @@
  *  Author: jayst
  */ 
 
-#include "_00_twiCtrlMaster.h"
+#include "twiCtrlMaster.h"
 
 
 uint8_t InitTwiM(uint32_t CPU_FREQ, uint32_t TWI_Bitrate, uint8_t TwiPreScaler)

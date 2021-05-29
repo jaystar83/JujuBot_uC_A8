@@ -5,8 +5,8 @@
  *  Author: jayst
  */ 
 
-#include "_00_pca9685.h"
-#include "_00_twiCtrlMaster.h"
+#include "pca9685.h"
+#include "twiCtrlMaster.h"
 
 uint8_t _PCA9685Addr;
 uint8_t _AutoIncrement(uint8_t Mode);

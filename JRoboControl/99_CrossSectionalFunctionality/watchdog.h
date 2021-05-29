@@ -1,11 +1,11 @@
 ﻿/*
- * _99_watchdog.h
+ * watchdog.h
  *
  * Created: 04.04.2021 21:16:30
  *  Author: jayst
  */ 
 
-#include "_99_defines.h"
+#include "defines.h"
 #if( SW_TEST_ACTIVE )
 	#include "_test_avrio.h"
 #else
@@ -13,8 +13,8 @@
 #endif
 
 
-#ifndef _99_WATCHDOG_H_
-#define _99_WATCHDOG_H_
+#ifndef watchdog_H_
+#define watchdog_H_
 
 typedef struct {
 	uint8_t WD_No;
@@ -38,4 +38,4 @@ void watchdog();
 
 
 
-#endif /* _99_WATCHDOG_H_ */
+#endif /* watchdog_H_ */

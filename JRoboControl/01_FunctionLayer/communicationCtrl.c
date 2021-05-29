@@ -5,8 +5,8 @@
  *  Author: jayst
  */ 
 
-#include "_01_communicationCtrl.h"
-#include "_00_serial.h"
+#include "communicationCtrl.h"
+#include "serial.h"
 
 // CONSTANTS	/////////////////////////////////////////////////////////////////////
 

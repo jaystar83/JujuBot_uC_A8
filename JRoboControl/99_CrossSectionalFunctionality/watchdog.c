@@ -1,11 +1,11 @@
 /*
- * _99_Watchdog.c
+ * watchdog.c
  *
  * Created: 04.04.2021 21:15:53
  *  Author: jayst
  */ 
 
-#include "_99_watchdog.h"
+#include "watchdog.h"
 
 watchdogData WD_Data[WATCHDOG_ELEMENTS] = {0};
 

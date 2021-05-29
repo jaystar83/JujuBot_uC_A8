@@ -1,5 +1,5 @@
 ﻿/*
- * _01_servoCtrl.h
+ * servoCtrl.h
  *
  * Created: 20.03.2021 16:15:48
  *  Author: jayst
@@ -8,7 +8,7 @@
 /***********************************************************************
 	GLOBAL DEFINITIONS
 ***********************************************************************/
-#include "_99_defines.h"
+#include "defines.h"
 
 /***********************************************************************
 	INCLUDES
@@ -21,11 +21,11 @@
 	#include <util/delay.h>
 #endif
 
-#include "_99_defines.h"
-#include "_00_pca9685.h"
+#include "defines.h"
+#include "pca9685.h"
 
-#ifndef _01_SERVOCTRL_H_
-#define _01_SERVOCTRL_H_
+#ifndef servoCtrl_H_
+#define servoCtrl_H_
 
 /***********************************************************************
 	DEFINES
@@ -92,4 +92,4 @@ uint8_t ServoData_SetAcceleration(uint8_t ServoNo, uint8_t Acceleration);
 uint8_t ServoData_SetDeceleratiom(uint8_t ServoNo, uint8_t Deceleration);
 
 
-#endif /* _01_SERVOCTRL_H_ */
+#endif /* servoCtrl_H_ */

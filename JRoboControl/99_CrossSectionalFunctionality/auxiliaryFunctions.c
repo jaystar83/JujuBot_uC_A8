@@ -5,7 +5,7 @@
  *  Author: jayst
  */ 
 
-#include "_99_auxiliaryFunctions.h"
+#include "auxiliaryFunctions.h"
 
 
 /***********************************************************************

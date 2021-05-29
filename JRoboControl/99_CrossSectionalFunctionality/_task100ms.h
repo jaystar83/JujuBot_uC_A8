@@ -1,7 +1,7 @@
-﻿/*
- * _taskIdle.h
+/*
+ * task100ms.h
  *
- * Created: 03.04.2021 23:10:36
+ * Created: 12.03.2021 20:13:07
  *  Author: jayst
  */ 
 
@@ -9,24 +9,25 @@
 /***********************************************************************
 	GLOBAL DEFINITIONS
 ***********************************************************************/
-#include "_99_defines.h"
+#include "defines.h"
 
 /***********************************************************************
 	ICNLUDES
 ***********************************************************************/
+#include "auxiliaryFunctions.h"
 #if( SW_TEST_ACTIVE )
 	#include "_test_avrio.h"
 #else
 	#include <avr/io.h>
 #endif
 
-#include "_99_auxiliaryFunctions.h"
-#include "_01_servoCtrl.h"
-#include "_01_communicationCtrl.h"
 
-#ifndef _TASKIDLE_H_
-#define _TASKIDLE_H_
+#ifndef TASK100MS_H_
+#define TASK100MS_H_
 
-void taskIdle(uint8_t IsrTimer2Ticks);
+void task100ms(uint8_t _100msCntInput);
 
-#endif /* _TASKIDLE_H_ */
+void blink1s(uint8_t blinkCntNo, uint8_t Port, uint8_t Pin);
+
+
+#endif /* TASK100MS_H_ */

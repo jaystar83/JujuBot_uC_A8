@@ -6,7 +6,7 @@
  */ 
 
 #include "_task100ms.h"
-#include "_00_serial.h"
+#include "serial.h"
 
 uint8_t blinkCnt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 uint8_t _100msCompare = 0;

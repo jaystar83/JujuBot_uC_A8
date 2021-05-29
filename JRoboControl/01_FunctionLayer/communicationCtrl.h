@@ -9,8 +9,8 @@
 /***********************************************************************
 	GLOBAL DEFINITIONS
 ***********************************************************************/
-#include "_99_defines.h"
-#include "_99_watchdog.h"
+#include "defines.h"
+#include "watchdog.h"
 
 
 #if( SW_TEST_ACTIVE )
@@ -19,7 +19,7 @@
 	#include <avr/io.h>
 #endif
 
-#include "_01_servoCtrl.h"
+#include "servoCtrl.h"
 
 #ifndef _COMMUNICATIONCTRL_H_
 #define _COMMUNICATIONCTRL_H_ 1

@@ -1,7 +1,7 @@
-/*
- * task100ms.h
+﻿/*
+ * _task1ms.h
  *
- * Created: 12.03.2021 20:13:07
+ * Created: 12.03.2021 21:43:21
  *  Author: jayst
  */ 
 
@@ -9,12 +9,14 @@
 /***********************************************************************
 	GLOBAL DEFINITIONS
 ***********************************************************************/
-#include "_99_defines.h"
+#include "defines.h"
 
 /***********************************************************************
 	ICNLUDES
 ***********************************************************************/
-#include "_99_auxiliaryFunctions.h"
+#include "auxiliaryFunctions.h"
+#include "servoCtrl.h"
+
 #if( SW_TEST_ACTIVE )
 	#include "_test_avrio.h"
 #else
@@ -22,12 +24,12 @@
 #endif
 
 
-#ifndef TASK100MS_H_
-#define TASK100MS_H_
+#ifndef _TASK1MS_H_
+#define _TASK1MS_H_
 
-void task100ms(uint8_t _100msCntInput);
-
-void blink1s(uint8_t blinkCntNo, uint8_t Port, uint8_t Pin);
+void task1ms(uint8_t MsToggle);
 
 
-#endif /* TASK100MS_H_ */
+
+
+#endif /* _TASK1MS_H_ */

@@ -1,5 +1,5 @@
 ﻿/*
- * _01_servoCtrl.c
+ * servoCtrl.c
  *
  * Created: 20.03.2021 16:16:04
  *  Author: jayst
@@ -22,8 +22,8 @@
 /***********************************************************************
 	ICNLUDES
 ***********************************************************************/
-#include "_01_servoCtrl.h"
-#include "_99_auxiliaryFunctions.h"
+#include "servoCtrl.h"
+#include "auxiliaryFunctions.h"
 
 /***********************************************************************
 	LOCAL VARS

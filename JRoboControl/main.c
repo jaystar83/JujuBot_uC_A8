@@ -3,6 +3,7 @@
  *
  * Created: 06.03.2021 14:36:18
  * Author : jaystar
+ * Version: 0.0.1_0002
  *
  * Beispiel für die 2. Version eines Programms, in der 3. Nebenversion und in der 5. Fehlerkorrektur, Build 0041:
  * 2.3.5_0041
@@ -16,7 +17,7 @@
 /***********************************************************************
 	DEFINITIONS
 ***********************************************************************/
-#include "_99_defines.h"
+#include "defines.h"
 
 /***********************************************************************
 	INCLUDES
@@ -31,14 +32,14 @@
 	#include <avr/interrupt.h>
 #endif
 
-#include "_00_serial.h"
+#include "serial.h"
 
-#include "_01_servoCtrl.h"
-#include "_01_CommunicationCtrl.h"
+#include "servoCtrl.h"
+#include "communicationCtrl.h"
 
-#include "_99_auxiliaryFunctions.h"
-#include "_99_timerConfig.h"
-#include "_99_watchdog.h"
+#include "auxiliaryFunctions.h"
+#include "timerConfig.h"
+#include "watchdog.h"
 
 #include "_task1ms.h"
 #include "_task100ms.h"

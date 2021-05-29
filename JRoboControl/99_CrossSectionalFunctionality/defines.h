@@ -1,5 +1,5 @@
 ﻿/*
- * _99_defines.h
+ * defines.h
  *
  * Created: 21.03.2021 19:14:15
  *  Author: jayst
