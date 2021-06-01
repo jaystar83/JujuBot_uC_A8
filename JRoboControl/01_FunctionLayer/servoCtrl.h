@@ -63,13 +63,16 @@ typedef struct {
 	
 }servoData;
 
-//uint8_t servoCtrlInit(servoData* ServoDataPtr, long FCPU, long TwiBaud, uint8_t TwePrescaler, uint8_t PCA9685Adress);
+
+/***********************************************************************
+	FUNCTIONS
+***********************************************************************/
 uint8_t ServoCtrlInit(long FCPU, long TwiBaud, uint8_t TwePrescaler, uint8_t PCA9685Adress);
 
-//uint8_t servoCtrlGoTo(servoData* ServoDataPtr);
-//uint8_t servoCtrlGoTo_2(servoData* ServoDataPtr, uint8_t isrCnt);
+// Runs in 1ms Task to check if Servo needs to run
 void SercoCtrl_CheckMoveRequest();
 
+// Runs in Idle Task to ctrl servo in 50us steps
 void ServoCtrl(uint8_t isrCnt);
 
 ////	Getter / Setter	////

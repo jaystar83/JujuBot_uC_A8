@@ -116,6 +116,10 @@ void ServoCtrl(uint8_t IsrCnt)
 	}
 }
 
+
+/***********************************************************************
+	GETTER / SETTER
+***********************************************************************/
 uint8_t ServoData_GetServoNo(uint8_t ServoNo)
 {
 	if(ServoNo >= SERVO_CNT)
@@ -315,28 +319,32 @@ uint8_t servoCtrlGoTo_2(uint8_t ServoNo, uint8_t Ticks)
 	- bewegungsrichtung muss gespeichert werden
 	- bewegungsumkehr erst nach Verzögerung auf 0
 */
+
+uint8_t motionInit(uint8_t ServoNo)
+{
+	servoArr[ServoNo].speedCtrlInitDone = FALSE;
+			
+	if(servoArr[ServoNo].currentPosition < servoArr[ServoNo].targetPosition)
+		return GO_TO_MAX;			////	Go to MAX
+			
+	else if(servoArr[ServoNo].currentPosition > servoArr[ServoNo].targetPosition)
+		return GO_TO_MIN;			////	Go to MIN
+			
+	return MOTION_FINISHED;			////	END
+
+}
+
 uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 {
-	// 0: Init, 1: to Max, 2: to Min, 3: Stop due to reversal of movement, 0xFE: Emergeny stop,  other: End
 	if(EmergencyStop_Request)
 		servoArr[ServoNo].servoCtrlGoTo_State = EMERGENCY_STOP;
-		
+
+	// 0: Init, 1: to Max, 2: to Min, 3: Stop due to reversal of movement, 0xFE: Emergeny stop,  other: End		
 	switch (servoArr[ServoNo].servoCtrlGoTo_State)
 	{
 	////	Init	////////////////////////////////////////////////////////////////
 	case MOTION_INIT:
-		servoArr[ServoNo].speedCtrlInitDone = FALSE;
-		
-		
-		if(servoArr[ServoNo].currentPosition < servoArr[ServoNo].targetPosition)
-			servoArr[ServoNo].servoCtrlGoTo_State = GO_TO_MAX;			// Go to MAX
-			
-		else if(servoArr[ServoNo].currentPosition > servoArr[ServoNo].targetPosition)
-			servoArr[ServoNo].servoCtrlGoTo_State = GO_TO_MAX;			// Go to MIN
-		
-		else
-			servoArr[ServoNo].servoCtrlGoTo_State = MOTION_FINISHED;	// END
-		
+		servoArr[ServoNo].servoCtrlGoTo_State = motionInit(ServoNo);
 		break;
 
 	////	Go to MAX	////////////////////////////////////////////////////////////
@@ -346,11 +354,25 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 		s = alpha/2 * t^2 + w_0 * t + s_0
 		
 		s = s(alpha,t) + s(w_0,t) + s_0
-		
 	*/
-	
-	
+		/*
+		1. Beschleunigen
+			1.1 prüfen, ob Distanz für Bremsvorgang erreicht ist
+			  -> Ja: Bremsvorgang einleiten
+			  -> Nein: Prüfen ob targetSpeed erreicht
+			    -> Ja: Beschleunigung Ende - Gleichförmige Bewegung starten
+				-> Nein: Beschleunigung fortsetzen
+		2. Gleichförmige Bewegung
+			2.1 Prüfen ob Distanz für Bremsvorgang erreicht ist
+			  -> Ja: Bremsvorgang einleiten
+			  -> Nein: Gleichförmige Bewegung fortsetzen
+		3. Bremsvorgang
+			3.1 Prüfen ob Zielüosition erreicht ist
+			  -> Ja: Bewegung beendet
+			  -> Nein: Bremsvorgang fortsetzen
+		*/
 		servoArr[ServoNo].currentSpeed = servoArr[ServoNo].targetSpeed;
+		
 		servoArr[ServoNo].servoCtrlGoTo_State = motionCtrl(ServoNo, Ticks);
 			
 		if( speedCtrl_2(ServoNo, servoArr[ServoNo].startSpeed, Ticks) )
@@ -469,7 +491,7 @@ uint8_t speedCtrl_2(uint8_t ServoNo, uint8_t ServoSpeed, uint8_t Ticks)
 		servoArr[ServoNo].stepDelayTicksToggle = Ticks;
 	}
 	
-	// veloTicksCntr reachs default value	////////////////////////////////////
+	// veloTicksCntr reaches default value	////////////////////////////////////
 	if(servoArr[ServoNo].stepDelayTicksCnt >= veloTicksDefault[ServoSpeed])
 	{
 		// Save passed Ticks for next cycle
