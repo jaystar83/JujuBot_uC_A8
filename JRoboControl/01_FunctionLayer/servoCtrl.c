@@ -367,7 +367,7 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 			  -> Ja: Bremsvorgang einleiten
 			  -> Nein: Gleichförmige Bewegung fortsetzen
 		3. Bremsvorgang
-			3.1 Prüfen ob Zielüosition erreicht ist
+			3.1 Prüfen ob Zielposition erreicht ist
 			  -> Ja: Bewegung beendet
 			  -> Nein: Bremsvorgang fortsetzen
 		*/

@@ -25,6 +25,7 @@
 #if SW_TEST_ACTIVE
 	#include "_test_avrio.h"
 	#include "_test_util_delay.h"
+	#include "_test_avr_interrupt.h"
 #else
 	#include <avr/io.h> // AVR types
 	//#include <util/delay.h>
