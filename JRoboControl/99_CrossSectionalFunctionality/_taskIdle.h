@@ -21,7 +21,7 @@
 #endif
 
 #include "auxiliaryFunctions.h"
-#include "servoCtrl.h"
+#include "servoMotionCtrl.h"
 #include "communicationCtrl.h"
 
 #ifndef _TASKIDLE_H_

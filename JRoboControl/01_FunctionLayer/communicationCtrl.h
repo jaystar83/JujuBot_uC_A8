@@ -19,8 +19,6 @@
 	#include <avr/io.h>
 #endif
 
-#include "servoCtrl.h"
-
 #ifndef _COMMUNICATIONCTRL_H_
 #define _COMMUNICATIONCTRL_H_ 1
 

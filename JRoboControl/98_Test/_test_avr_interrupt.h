@@ -10,15 +10,14 @@
 #define _TEST_AVR_INTERRUPT_H_
 
 #define ISR(isv) {	\
-	void isv(void)
-	
+	void isv(void)	\
 }
 
-#ifndef
+#ifndef TIMER0_COMPA_vect
 	#define TIMER0_COMPA_vect	isr_t0_compA
 #endif
 
-#ifndef 
+#ifndef TIMER2_COMPA_vect 
 	#define TIMER2_COMPA_vect	isr_t2_compA
 #endif
 

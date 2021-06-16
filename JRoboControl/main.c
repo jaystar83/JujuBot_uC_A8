@@ -35,7 +35,7 @@
 
 #include "serial.h"
 
-#include "servoCtrl.h"
+#include "servoDataCtrl.h"
 #include "communicationCtrl.h"
 
 #include "auxiliaryFunctions.h"

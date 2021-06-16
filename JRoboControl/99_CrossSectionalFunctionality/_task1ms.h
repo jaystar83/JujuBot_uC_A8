@@ -14,8 +14,6 @@
 /***********************************************************************
 	ICNLUDES
 ***********************************************************************/
-#include "auxiliaryFunctions.h"
-#include "servoCtrl.h"
 
 #if( SW_TEST_ACTIVE )
 	#include "_test_avrio.h"

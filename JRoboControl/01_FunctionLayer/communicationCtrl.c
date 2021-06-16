@@ -8,6 +8,8 @@
 #include "communicationCtrl.h"
 #include "serial.h"
 
+#include "servoDataCtrl.h"
+
 // CONSTANTS	/////////////////////////////////////////////////////////////////////
 
 // VARS	/////////////////////////////////////////////////////////////////////////////
@@ -86,7 +88,7 @@ uint8_t CommunicationCtrl()
 				ServoData_SetTargetPosition(0, (uint16_t)(serialReadBuffer[1]) + ((uint16_t)(serialReadBuffer[2])<<8) );
 				ServoData_SetTargetSpeed(0, serialReadBuffer[3]);
 				ServoData_SetAcceleration(0, serialReadBuffer[4]);
-				ServoData_SetDeceleratiom(0, serialReadBuffer[5]);
+				ServoData_SetDeceleration(0, serialReadBuffer[5]);
 
 				#if( DEV_SERIAL_OUTPUT == TRUE )
 					uart_writeServoData(0);
@@ -95,7 +97,7 @@ uint8_t CommunicationCtrl()
 				ServoData_SetTargetPosition(1, (uint16_t)(serialReadBuffer[6]) + ((uint16_t)(serialReadBuffer[7])<<8) );
 				ServoData_SetTargetSpeed(1, serialReadBuffer[8]);
 				ServoData_SetAcceleration(1, serialReadBuffer[9]);
-				ServoData_SetDeceleratiom(1, serialReadBuffer[10]);
+				ServoData_SetDeceleration(1, serialReadBuffer[10]);
 						
 				#if( DEV_SERIAL_OUTPUT == TRUE )
 					uart_writeServoData(1);

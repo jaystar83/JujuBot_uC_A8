@@ -6,7 +6,7 @@
  */ 
 
 #include "defines.h"
-#include "_test_avr_interrupt"
+#include "_test_avr_interrupt.h"
 
 /*
 hier muss nach aufruf von sei() ein threat für die timer ISR gestartet werden

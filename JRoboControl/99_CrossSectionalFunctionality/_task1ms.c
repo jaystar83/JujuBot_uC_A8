@@ -6,6 +6,9 @@
  */ 
 
 #include "_task1ms.h"
+
+#include "auxiliaryFunctions.h"
+#include "servoMotionCtrl.h"
 #include "serial.h"
 
 uint8_t msToggleCompare = 0;

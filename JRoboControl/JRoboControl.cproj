@@ -185,10 +185,16 @@
     <Compile Include="01_FunctionLayer\communicationCtrl.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="01_FunctionLayer\servoCtrl.c">
+    <Compile Include="01_FunctionLayer\servoMotionCtrl.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="01_FunctionLayer\servoCtrl.h">
+    <Compile Include="01_FunctionLayer\servoMotionCtrl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="01_FunctionLayer\servoDataCtrl.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="01_FunctionLayer\servoDataCtrl.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="97_Obsolete\old_commandInterpreter.h">
