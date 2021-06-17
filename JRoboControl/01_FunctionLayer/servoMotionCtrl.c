@@ -116,30 +116,11 @@ uint8_t servoCtrlGoTo(uint8_t ServoNo, uint8_t Ticks)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-/*
-	- neue Funktion *_3
-	- bewegungsrichtung muss gespeichert werden
-	- bewegungsumkehr erst nach Verzögerung auf 0
-*/
-
-uint8_t motionInit(uint8_t ServoNo)
-{
-	ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
-		
-	if( ServoData_GetCurrentPosition(ServoNo) < ServoData_GetTargetPosition(ServoNo) )
-		return GO_TO_MAX;			////	Go to MAX
-			
-	else if( ServoData_GetCurrentPosition(ServoNo) > ServoData_GetTargetPosition(ServoNo) )
-		return GO_TO_MIN;			////	Go to MIN
-			
-	return MOTION_FINISHED;			////	END
-
-}
-
 uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 {
 	if(EmergencyStop_Request)
 		ServoData_SetMotionCtrlState(ServoNo, EMERGENCY_STOP);
+
 	// 0: Init, 1: to Max, 2: to Min, 3: Stop due to reversal of movement, 0xFE: Emergeny stop,  other: End		
 	switch( ServoData_GetMotionCtrlState(ServoNo) )
 	{
@@ -171,13 +152,12 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 			  -> Ja: Bewegung beendet
 			  -> Nein: Bremsvorgang fortsetzen
 		*/
-//		servoArr[ServoNo].currentSpeed = servoArr[ServoNo].targetSpeed;
 		
 		// checking acc, position to start dec, calculating dec, if received value not valid
 		ServoData_SetMotionCtrlState(ServoNo, motionCtrl(ServoNo, Ticks) );
 
-		// calculating speed depending on acc / decelaration 
-		ServoData_SetCurrentSpeed(ServoNo, speedControl(ServoNo, Ticks));		
+		// calculating speed depending on motionPhase -> accelaration / constant / decelaration 
+		ServoData_SetCurrentSpeed(ServoNo, speedControl(ServoNo, Ticks) );		
 		
 		// waiting for next Step depwnding on calculated speed
 		if( stepCtrl(ServoNo, Ticks) )
@@ -227,86 +207,34 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 		ServoData_SetSpeedCtrlInitDone(ServoNo, FALSE);
 		ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
 		ServoData_SetMotionCtrlState(ServoNo, MOTION_INIT);
-		
+		ServoData_SetMotionPhase(ServoNo, 0);
 		return FALSE;
 	}
 
 	return TRUE;
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// BACKUP
-	////
-/*
-	if(servoArr[ServoNo].currentPosition > servoArr[ServoNo].targetPosition)
-	{
-		servoArr[ServoNo].currentSpeed = servoArr[ServoNo].targetSpeed;
-		if( stepCtrl(ServoNo, Ticks) )
-		{
-			servoArr[ServoNo].currentPosition--;
-			#if( SERVEO_CTRL_BOARD_AVAILABLE )
-			Servo(ServoNo, servoArr[ServoNo].currentPosition);
-			#endif
-		}
-		
-		return TRUE;
-	}
-	else if(servoArr[ServoNo].currentPosition < servoArr[ServoNo].targetPosition)
-	{
-		servoArr[ServoNo].currentSpeed = servoArr[ServoNo].targetSpeed;
-		if( stepCtrl(ServoNo, Ticks) )
-		{
-			servoArr[ServoNo].currentPosition++;
-			#if( SERVEO_CTRL_BOARD_AVAILABLE )
-			Servo(ServoNo, servoArr[ServoNo].currentPosition);
-			#endif
-		}
-		
-		return TRUE;
-	}
-	
-	servoArr[ServoNo].currentSpeed = 0;
-	servoArr[ServoNo].moveRequest = FALSE;
-	servoArr[ServoNo].stepCtrlInitDone = FALSE;
-	return FALSE;
-*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-/*
-uint8_t stepCtrl_Old(uint8_t ServoNo, uint8_t ServoSpeed, uint8_t Ticks)
+uint8_t motionInit(uint8_t ServoNo)
 {
-	// Init stepCtrl	////////////////////////////////////////////////////
-	if(!servoArr[ServoNo].stepCtrlInitDone)
-	{
-		servoArr[ServoNo].stepCtrlInitDone = TRUE;
-		servoArr[ServoNo].stepDelayTicksToggle = Ticks;
-		servoArr[ServoNo].stepDelayTicksCnt = 0;
-	}
-
-	// Check if Ticks increased	////////////////////////////////////////////
-	if(servoArr[ServoNo].stepDelayTicksToggle != Ticks)
-	{
-		// Ticks overflow
-		if(servoArr[ServoNo].stepDelayTicksToggle > Ticks)
-			servoArr[ServoNo].stepDelayTicksCnt += (255 - servoArr[ServoNo].stepDelayTicksToggle) + Ticks;
-		// No overflow
-		else
-			servoArr[ServoNo].stepDelayTicksCnt += Ticks - servoArr[ServoNo].stepDelayTicksToggle;
+	ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
 		
-		servoArr[ServoNo].stepDelayTicksToggle = Ticks;
-	}
-	
-	// veloTicksCntr reaches default value	////////////////////////////////////
-	if(servoArr[ServoNo].stepDelayTicksCnt >= veloTicksDefault[ServoSpeed])
-	{
-		// Save passed Ticks for next cycle
-		servoArr[ServoNo].stepDelayTicksCnt -= veloTicksDefault[ServoSpeed];
-		return TRUE;
-	}
-	
-	return FALSE;
+	if( ServoData_GetCurrentPosition(ServoNo) < ServoData_GetTargetPosition(ServoNo) )
+		return GO_TO_MAX;			////	Go to MAX
+			
+	else if( ServoData_GetCurrentPosition(ServoNo) > ServoData_GetTargetPosition(ServoNo) )
+		return GO_TO_MIN;			////	Go to MIN
+			
+	return MOTION_FINISHED;			////	END
+
 }
-*/
+
+motionCtrl(uint8_t ServoNo, uint8_t Ticks)
+{
+	
+}
+
 uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)
 {
 	// Init stepCtrl	////////////////////////////////////////////////////
@@ -344,33 +272,69 @@ uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)
 uint8_t speedControl(uint8_t ServoNo, uint8_t Ticks)
 {
 	// Init stepCtrl	////////////////////////////////////////////////////
-	if( ServoData_GetStepCtrlInitDone(ServoNo) == FALSE )
+	if( ServoData_GetSpeedCtrlInitDone(ServoNo) == FALSE )
 	{
-		ServoData_SetStepCtrlInitDone(ServoNo, TRUE);
-		ServoData_SetStepDelayTicksToggle(ServoNo, Ticks);
-		ServoData_SetStepDelayTicksCnt(ServoNo, 0);
+		ServoData_SetSpeedCtrlInitDone(ServoNo, TRUE);
+		ServoData_SetSpeedDelayTicksToggle(ServoNo, Ticks);
+		ServoData_SetSpeedDelayTicksCnt(ServoNo, 0);
 	}
 
 	// Check if Ticks increased	////////////////////////////////////////////
-	if( ServoData_GetStepDelayTicksToggle(ServoNo) != Ticks )
+	if( ServoData_GetSpeedDelayTicksToggle(ServoNo) != Ticks )
 	{
 		// Ticks overflow
-		if( ServoData_GetStepDelayTicksToggle(ServoNo) > Ticks )
-			ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) + 255 - ServoData_GetStepDelayTicksToggle(ServoNo) );
+		if( ServoData_GetSpeedDelayTicksToggle(ServoNo) > Ticks )
+			ServoData_SetSpeedDelayTicksCnt(ServoNo, ServoData_GetSpeedDelayTicksCnt(ServoNo) + 255 - ServoData_GetSpeedDelayTicksToggle(ServoNo) );
 		// No overflowveloTicksDefault
 		else
-			ServoData_SetStepDelayTicksCnt(ServoNo, Ticks - ServoData_GetStepDelayTicksCnt(ServoNo) );
+			ServoData_SetSpeedDelayTicksCnt(ServoNo, Ticks - ServoData_GetSpeedDelayTicksCnt(ServoNo) );
 		
-		ServoData_SetStepDelayTicksToggle(ServoNo, Ticks);
+		ServoData_SetSpeedDelayTicksToggle(ServoNo, Ticks);
 	}
 	
 	// veloTicksCntr reaches default value	////////////////////////////////////
-	if(ServoData_GetStepDelayTicksCnt(ServoNo) >=  veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] )
+	if(ServoData_GetSpeedDelayTicksCnt(ServoNo) >=  veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] )
 	{
 		// Save passed Ticks for next cycle
-		ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) - veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] );
+		ServoData_SetSpeedDelayTicksCnt(ServoNo, ServoData_GetSpeedDelayTicksCnt(ServoNo) - veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] );
 		return TRUE;
 	}
 	
 	return FALSE;
 }
+
+/*
+uint8_t stepCtrl_Old(uint8_t ServoNo, uint8_t ServoSpeed, uint8_t Ticks)
+{
+	// Init stepCtrl	////////////////////////////////////////////////////
+	if(!servoArr[ServoNo].stepCtrlInitDone)
+	{
+		servoArr[ServoNo].stepCtrlInitDone = TRUE;
+		servoArr[ServoNo].stepDelayTicksToggle = Ticks;
+		servoArr[ServoNo].stepDelayTicksCnt = 0;
+	}
+
+	// Check if Ticks increased	////////////////////////////////////////////
+	if(servoArr[ServoNo].stepDelayTicksToggle != Ticks)
+	{
+		// Ticks overflow
+		if(servoArr[ServoNo].stepDelayTicksToggle > Ticks)
+			servoArr[ServoNo].stepDelayTicksCnt += (255 - servoArr[ServoNo].stepDelayTicksToggle) + Ticks;
+		// No overflow
+		else
+			servoArr[ServoNo].stepDelayTicksCnt += Ticks - servoArr[ServoNo].stepDelayTicksToggle;
+		
+		servoArr[ServoNo].stepDelayTicksToggle = Ticks;
+	}
+	
+	// veloTicksCntr reaches default value	////////////////////////////////////
+	if(servoArr[ServoNo].stepDelayTicksCnt >= veloTicksDefault[ServoSpeed])
+	{
+		// Save passed Ticks for next cycle
+		servoArr[ServoNo].stepDelayTicksCnt -= veloTicksDefault[ServoSpeed];
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+*/
