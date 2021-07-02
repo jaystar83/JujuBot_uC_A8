@@ -32,6 +32,13 @@
 // Vorgabe der Tick-Zahl {0, 800 -> 40ms, ...                                                                                  1,1ms, 1,1ms, 1.05ms, 1.05ms, 1ms};
 uint16_t veloTicksDefault[] = {0,800,400,267,200,160,133,114,100,89,80,73,67,62,57,53,50,47,44,42,40,38,36,35,33,32,31,30,29,28,27,26,25,24,24,23,22,22,21,21,20};
 
+uint16_t stepsToStop[5][40] = {	{1,4,8,13,20,29,39,50,64,79,95,113,133,154,176,200,226,254,283,313,345,379,414,450,489,529,570,613,658,703,751,800,851,904,958,1013,1070,1129,1189,1250},
+								{1,2,3,5,8,12,16,20,26,32,38,45,53,62,71,80,91,102,113,125,138,152,166,180,196,212,228,245,263,282,301,320,341,362,383,405,428,452,476,500},
+								{1,1,2,3,4,6,8,10,13,16,19,23,27,31,36,40,46,51,57,63,69,76,83,90,98,106,114,123,132,141,151,160,171,181,192,203,214,226,238,250},
+								{1,1,1,1,2,3,4,4,6,7,8,9,11,13,15,16,19,21,23,25,28,31,34,36,40,43,46,49,53,57,61,64,69,73,77,81,86,91,96,100},
+								{1,1,1,1,1,2,2,2,3,4,4,5,6,7,8,8,10,11,12,13,14,16,17,18,20,22,23,25,27,29,31,32,35,37,39,41,43,46,48,50}
+							  };
+
 // Counter of 50us ticks to increment / decrement speed
 // st/ms^2 :                    0, 0.0004, 0,001, 0.002, 0.005, 0.01
 uint16_t accDecSpeedIncTickCnt[] = {0, 1250, 500, 250, 100, 50};
@@ -219,7 +226,8 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 uint8_t motionInit(uint8_t ServoNo)
 {
 	ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
-		
+	ServoData_SetSpeedCtrlInitDone(ServoNo, FALSE);
+	
 	if( ServoData_GetCurrentPosition(ServoNo) < ServoData_GetTargetPosition(ServoNo) )
 		return GO_TO_MAX;			////	Go to MAX
 			
@@ -230,9 +238,10 @@ uint8_t motionInit(uint8_t ServoNo)
 
 }
 
-motionCtrl(uint8_t ServoNo, uint8_t Ticks)
+uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 {
 	
+	return TRUE;
 }
 
 uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)
