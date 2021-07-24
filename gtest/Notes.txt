@@ -2,4 +2,7 @@ cd build
 cmake ..
 cmake --build -j
 ctest
-hello_test.exe
+
+hello_test.exe --gtest_output=xml:xunit.xml
+
+generateTestreport.bat build\hello_test.exe  build\testReport

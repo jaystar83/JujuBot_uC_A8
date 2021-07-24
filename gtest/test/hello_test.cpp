@@ -12,6 +12,7 @@ TEST(HelloTest, BasicAssertions)
     EXPECT_EQ(7 * 6, 42);
 }
 
+/*
 TEST(sumValues_PASS, BasicAssertions) 
 {
     int retVal = sumValues(12,11);
@@ -20,6 +21,20 @@ TEST(sumValues_PASS, BasicAssertions)
 }
 
 TEST(sumValues_FAIL, BasicAssertions) 
+{
+    int retVal = sumValues(12,12);
+    EXPECT_EQ(retVal, 23);
+
+}
+*/
+TEST(sumValues_TestSuit, PassTests) 
+{
+    int retVal = sumValues(12,11);
+    EXPECT_EQ(retVal, 23);
+
+}
+
+TEST(sumValues_TestSuit, FailTests) 
 {
     int retVal = sumValues(12,12);
     EXPECT_EQ(retVal, 23);
