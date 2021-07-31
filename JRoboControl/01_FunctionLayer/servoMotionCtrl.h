@@ -30,7 +30,8 @@
 /***********************************************************************
 	DEFINES
 ***********************************************************************/
-#define SPEED_MAX 255
+#define SPEED_MAX 40
+#define ACC_DEC_MAX 5
 
 #define MOTION_INIT 0
 #define GO_TO_MAX 1

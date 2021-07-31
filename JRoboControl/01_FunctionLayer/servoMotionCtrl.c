@@ -160,7 +160,7 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 			  -> Nein: Bremsvorgang fortsetzen
 		*/
 		
-		// checking acc, position to start dec, calculating dec, if received value not valid
+		// checking acc, position to start dec and calculating dec, if received value not valid
 		ServoData_SetMotionCtrlState(ServoNo, motionCtrl(ServoNo, Ticks) );
 
 		// calculating speed depending on motionPhase -> accelaration / constant / decelaration 
@@ -225,14 +225,28 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 ////////////////////////////////////////////////////////////////////////////////////
 uint8_t motionInit(uint8_t ServoNo)
 {
-	ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
-	ServoData_SetSpeedCtrlInitDone(ServoNo, FALSE);
+	ServoData_SetStepCtrlInitDone( ServoNo, FALSE );
+	ServoData_SetSpeedCtrlInitDone( ServoNo, FALSE );
 	
+	// Checking servoCtrlData
+	if( ServoData_GetAcceleration( ServoNo ) > ACC_DEC_MAX )
+		ServoData_SetAcceleration( ServoNo, ACC_DEC_MAX );
+		
+	if( ServoData_GetDecelaration( ServoNo ) > ACC_DEC_MAX )
+		ServoData_SetDeceleration( ServoNo, ACC_DEC_MAX );
+
+	if( ServoData_GetTargetSpeed( ServoNo ) > SPEED_MAX )
+		ServoData_SetTargetSpeed( ServoNo, SPEED_MAX );
+
+	// 	Checking the moving direction
 	if( ServoData_GetCurrentPosition(ServoNo) < ServoData_GetTargetPosition(ServoNo) )
 		return GO_TO_MAX;			////	Go to MAX
 			
 	else if( ServoData_GetCurrentPosition(ServoNo) > ServoData_GetTargetPosition(ServoNo) )
 		return GO_TO_MIN;			////	Go to MIN
+	
+	// Starting with acceleration phase 
+	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);
 			
 	return MOTION_FINISHED;			////	END
 
@@ -240,8 +254,55 @@ uint8_t motionInit(uint8_t ServoNo)
 
 uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 {
+			/*
+		1. Beschleunigen
+			1.1 prüfen, ob Distanz für Bremsvorgang erreicht ist
+			  -> Ja: Bremsvorgang einleiten
+			  -> Nein: Prüfen ob targetSpeed erreicht
+			    -> Ja: Beschleunigung Ende - Gleichförmige Bewegung starten
+				-> Nein: Beschleunigung fortsetzen
+		2. Gleichförmige Bewegung
+			2.1 Prüfen ob Distanz für Bremsvorgang erreicht ist
+			  -> Ja: Bremsvorgang einleiten
+			  -> Nein: Gleichförmige Bewegung fortsetzen
+		3. Bremsvorgang
+			3.1 Prüfen ob Zielposition erreicht ist
+			  -> Ja: Bewegung beendet
+			  -> Nein: Bremsvorgang fortsetzen
+		*/
+
+	// 1. Checking declaration and breaking distance
+	uint8_t RetVal = 0;
+
+	uint16_t currentPosi = ServoData_GetCurrentPosition(ServoNo);
+	uint16_t targetPosi = ServoData_GetTargetPosition(ServoNo);
+	uint16_t stepsForStop = stepsToStop[ ServoData_GetDecelaration(ServoNo)-1 ][ ServoData_GetCurrentSpeed(ServoNo)-1 ];
 	
-	return TRUE;
+	
+	if acc == 0;
+		-> speed = tarApeed
+		uniMotion
+	else if( ServoData_GetMotionCtrlState( ServoNo ) == GO_TO_MAX )
+	{	/* TargetPosi - requiredBrakingDistance(Dec, Speed) >= Current Posi */
+//		if( ServoData_GetCurrentPosition(ServoNo) <= ServoData_GetTargetPosition(ServoNo) - stepsToStop[ ServoData_GetDecelaration(ServoNo)-1, ServoData_GetCurrentSpeed(ServoNo)-1 ] )
+		if( (dec != 0) && (currentPosi <= targetPosi - stepsForStop) )
+		{	
+			ServoData_SetMotionPhase(ServoNo, MoPha_DEC);
+			RetVal = GO_TO_MAX;
+		}
+	}
+	else if( ServoData_GetMotionCtrlState( ServoNo ) == GO_TO_MIN )
+	{	/* TargetPosi + requiredBrakingDistance(Dec, Speed) >= Current Posi */
+//		if( ServoData_GetCurrentPosition(ServoNo) <= ServoData_GetTargetPosition(ServoNo) + stepsToStop[ ServoData_GetDecelaration(ServoNo)-1, ServoData_GetCurrentSpeed(ServoNo)-1 ] )
+		if( currentPosi <= targetPosi + stepsForStop )
+		{
+			ServoData_SetMotionPhase(ServoNo, MoPha_DEC);
+			RetVal = GO_TO_MIN;
+		}
+	}
+	
+	
+	return RetVal;
 }
 
 uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)

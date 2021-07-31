@@ -60,6 +60,10 @@ typedef struct {
 	
 }servoData;
 
+#define MoPha_OFF 0
+#define MoPha_ACC 1
+#define MoPha_UNI 2
+#define MoPha_DEC 3
 
 /***********************************************************************
 	FUNCTIONS
