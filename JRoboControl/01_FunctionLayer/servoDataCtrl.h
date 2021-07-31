@@ -43,7 +43,6 @@ typedef struct {
 	uint16_t currentPosition;
 	uint8_t currentSpeed;
 	
-
 	//// Data for ServoCtrlGoTo	////
 	uint8_t servoMotionCtrl_State;		// 0: Init, 1: to Max, 2: to Min, 3: Emergeny stop,  other -> End
 	uint8_t motionPhase;				// 0: -, 1: Acceleration, 2: uniform movement, 3: decelaration
@@ -60,10 +59,10 @@ typedef struct {
 	
 }servoData;
 
-#define MoPha_OFF 0
-#define MoPha_ACC 1
-#define MoPha_UNI 2
-#define MoPha_DEC 3
+#define MoPha_OFF 0		// - 
+#define MoPha_ACC 1		// Acceleration
+#define MoPha_UNI 2		// Uniform movement
+#define MoPha_DEC 3		// Deceleration
 
 /***********************************************************************
 	FUNCTIONS
