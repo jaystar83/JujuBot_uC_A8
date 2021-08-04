@@ -59,10 +59,12 @@ typedef struct {
 	
 }servoData;
 
-#define MoPha_OFF 0		// - 
-#define MoPha_ACC 1		// Acceleration
-#define MoPha_UNI 2		// Uniform movement
-#define MoPha_DEC 3		// Deceleration
+#define MoPha_OFF				0	// Stop 
+#define MoPha_AccToTargetSpeed	1	// Acceleration to target speed
+#define MoPha_UniformMoving		2	// Uniform movement
+#define MoPha_DecToStop			3	// Deceleration to Stop
+#define MoPha_DecToTargetSpeed	4	// Deceleration to target speed
+
 
 /***********************************************************************
 	FUNCTIONS
