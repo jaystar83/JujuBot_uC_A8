@@ -304,18 +304,10 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 			/* a) if the direction changes	*/
 			if ( currentPosi > targetPosi ) 
 			{
-				if( decelaration != 0 )
-				{
-					if ( currentSpeed > 0)
-					{	
-						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-						RetVal = motionCtrlState;	// No change of motionCtrlState	
-					}
-					else
-					{
-						ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
-						RetVal = GO_TO_MIN;		// Changing direction
-					}
+				if( (decelaration != 0) && (currentSpeed > 0) )
+				{	
+					ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+					RetVal = motionCtrlState;	// No change of motionCtrlState	
 				}
 				else // no decelaration -> directly go on into other direction
 				{
@@ -329,25 +321,6 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase 
 				RetVal = motionCtrlState;	// No change of motionCtrlState
 			}
-			/* c) target speed is reached */
-			else if( currentSpeed == targetSpeed )
-			{			
-				ServoData_SetMotionPhase(ServoNo, MoPha_UniformMoving);	// Uniform movement
-				RetVal = motionCtrlState;	// No change of motionCtrlState
-			}
-			/* d) currentSpeed > targetSpeed */
-			else if( currentSpeed > targetSpeed )
-			{
-				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState
-				
-			}
-			/* e) accelaration progress */
-			else
-			{
-				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
-				RetVal = motionCtrlState;	// No change of motionCtrlState
-			}			
 		}
 
 		/* 3) Moving direction to Servo Min Position */
@@ -381,20 +354,24 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
 				RetVal = motionCtrlState;	// No change of motionCtrlState
 			}
-			/* c) target speed is reached */
-			else if( currentSpeed == targetSpeed )
+		}
+		/* 4. independent of moving direction */
+		else
+		{			
+			/* a) target speed is reached */
+			if( currentSpeed == targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_UniformMoving);	// Uniform movement
 				RetVal = motionCtrlState;	// No change of motionCtrlState
 			}
-			/* d) currentSpeed > targetSpeed */
+			/* b) currentSpeed > targetSpeed */
 			else if( currentSpeed > targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
 				RetVal = motionCtrlState;	// No change of motionCtrlState
 					
 			}
-			/* e) accelaration progress */
+			/* c) accelaration progress */
 			else
 			{
 				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
@@ -407,14 +384,294 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	/***	Phase 2 - Uniform movement	***/
 	case MoPha_UniformMoving:
 	
+		/* 1) Moving direction to Servo Max Position */
+		if( GO_TO_MAX == motionCtrlState )
+		{
+			/* a) if the direction changes	*/
+			if ( currentPosi > targetPosi )
+			{
+				if( decelaration != 0 )
+				{
+					if ( currentSpeed > 0)
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+						RetVal = motionCtrlState;	// No change of motionCtrlState
+					}
+					else
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+						RetVal = GO_TO_MIN;		// Changing direction
+					}
+				}
+				else // no decelaration -> directly go on into other direction
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+					RetVal = GO_TO_MIN;		// Changing direction
+				}
+			}
+			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
+			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			{
+				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* c) currentSpeed > targetSpeed */
+			else if( currentSpeed > targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			
+			}
+			/* d) currentSpeed < targetSpeed */
+			else if( currentSpeed < targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			
+			}
+			/* e) uniform moving in progress */
+			else
+			{
+				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+		}
+	
+		/* 2) Moving direction to Servo Min Position */
+		else if( GO_TO_MIN == motionCtrlState )
+		{
+			/* a) if the direction changes	*/
+			if ( currentPosi < targetPosi )
+			{
+				if( decelaration != 0 )
+				{
+					if ( currentSpeed > 0)
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+						RetVal = motionCtrlState;	// No change of motionCtrlState
+					}
+					else
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+						RetVal = GO_TO_MAX;		// Changing direction
+					}
+				}
+				else // no decelaration -> directly go on into other direction
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+					RetVal = GO_TO_MAX;		// Changing direction
+				}
+			}
+			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
+			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			{
+				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* c) currentSpeed > targetSpeed */
+			else if( currentSpeed > targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			
+			}
+			/* d) currentSpeed < targetSpeed */
+			else if( currentSpeed < targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+				
+			}
+			/* e) uniform moving in progress */
+			else
+			{
+				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+		}	
 		break;
-		
+
 	/***	Phase 3 - Deceleration to target Speed	***/
 	case MoPha_DecToTargetSpeed:
+		/* 1) Moving direction to Servo Max Position */
+		if( GO_TO_MAX == motionCtrlState )
+		{
+			/* a) if the direction changes	*/
+			if ( currentPosi > targetPosi )
+			{
+				if( (decelaration != 0) && (currentSpeed > 0) )
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+					RetVal = motionCtrlState;	// No change of motionCtrlState
+				}
+				else // no decelaration -> directly go on into other direction
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+					RetVal = GO_TO_MIN;		// Changing direction
+				}
+			}
+			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
+			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			{
+				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* c) currentSpeed < targetSpeed */
+			else if( currentSpeed < targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* d) currentSpeed > targetSpeed */
+			else if( currentSpeed > targetSpeed )
+			{
+				// not needed ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState			
+			}
+			/* e) uniform moving in progress */
+			else
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_UniformMoving);	// going on with uniform movement
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+		}
+		
+		/* 2) Moving direction to Servo Min Position */
+		else if( GO_TO_MIN == motionCtrlState )
+		{
+			/* a) if the direction changes	*/
+			if ( currentPosi > targetPosi )
+			{
+				if( (decelaration != 0) && (currentSpeed > 0) )
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+					RetVal = motionCtrlState;	// No change of motionCtrlState
+				}
+				else // no decelaration -> directly go on into other direction
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+					RetVal = GO_TO_MAX;		// Changing direction
+				}
+			}
+			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
+			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			{
+				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* c) currentSpeed < targetSpeed */
+			else if( currentSpeed < targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* d) currentSpeed > targetSpeed -> current phase */
+			else if( currentSpeed > targetSpeed )
+			{
+				// not needed ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* e) uniform moving in progress */
+			else
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_UniformMoving);	// going on with uniform movement
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
 		break;
 		
 	/***	Phase 4 - Deceleration to Stop	***/
 	case MoPha_DecToStop:
+		/* 1) Moving direction to Servo Max Position */
+		if( GO_TO_MAX == motionCtrlState )
+		{
+			/* a) if the direction changes	*/
+			if ( currentPosi < targetPosi )
+			{
+				if( decelaration != 0 )
+				{
+					if ( currentSpeed > 0)
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+						RetVal = motionCtrlState;	// No change of motionCtrlState
+					}
+					else
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+						RetVal = GO_TO_MIN;		// Changing direction
+					}
+				}
+				else // no decelaration -> directly go on into other direction
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+					RetVal = GO_TO_MIN;		// Changing direction
+				}
+			}
+			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
+			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			{
+				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* c) currentSpeed > targetSpeed */
+			else if( currentSpeed > targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			
+			}
+			/* d) uniform moving in progress */
+			else
+			{
+				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+		}
+	
+		/* 2) Moving direction to Servo Min Position */
+		else if( GO_TO_MIN == motionCtrlState )
+		{
+			/* a) if the direction changes	*/
+			if ( currentPosi < targetPosi )
+			{
+				if( decelaration != 0 )
+				{
+					if ( currentSpeed > 0)
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
+						RetVal = motionCtrlState;	// No change of motionCtrlState
+					}
+					else
+					{
+						ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+						RetVal = GO_TO_MAX;		// Changing direction
+					}
+				}
+				else // no decelaration -> directly go on into other direction
+				{
+					ServoData_SetMotionPhase( ServoNo, MoPha_AccToTargetSpeed );	// Changing direction, starting with Acceleration Phase
+					RetVal = GO_TO_MAX;		// Changing direction
+				}
+			}
+			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
+			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			{
+				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+			/* c) currentSpeed > targetSpeed */
+			else if( currentSpeed > targetSpeed )
+			{
+				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			
+			}
+			/* d) umiform moving progress */
+			else
+			{
+				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
+				RetVal = motionCtrlState;	// No change of motionCtrlState
+			}
+		}	
 		break;
 
 	/***	Phase XX - Motion control OFF	***/
