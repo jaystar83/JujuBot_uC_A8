@@ -36,7 +36,6 @@
 #define MOTION_INIT 0
 #define GO_TO_MAX 1
 #define GO_TO_MIN  2
-#define GO_TO_REVERT  3
 #define EMERGENCY_STOP  0xFE
 #define MOTION_FINISHED  0xFF
 

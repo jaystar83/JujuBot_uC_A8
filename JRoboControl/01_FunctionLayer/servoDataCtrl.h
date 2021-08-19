@@ -72,6 +72,8 @@ typedef struct {
 uint8_t ServoCtrlInit(long FCPU, long TwiBaud, uint8_t TwePrescaler, uint8_t PCA9685Adress);
 
 ////	Getter / Setter	////
+uint8_t ServoData_GetServoData(uint8_t ServoNo, servoData *ServoCtrlData);
+
 uint8_t ServoData_GetMotionCtrlState(uint8_t ServoNo);
 
 uint8_t ServoData_GetServoNo(uint8_t ServoNo);

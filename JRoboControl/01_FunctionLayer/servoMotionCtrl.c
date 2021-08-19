@@ -47,12 +47,13 @@ uint8_t EmergencyStop_Request = 0;
 /***********************************************************************
 	LOCAL FUNCTIONS DEFINITION
 ***********************************************************************/
-uint8_t stepCtrl(uint8_t ServoNo, uint8_t ServoSpeed);
+uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks);
 //uint8_t stepCtrl_Old(uint8_t ServoNo, uint8_t ServoSpeed, uint8_t Ticks);	
 
 uint8_t speedControl(uint8_t ServoNo, uint8_t Ticks);
 
 uint8_t servoCtrlGoTo(uint8_t ServoNo, uint8_t Ticks);
+uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks);
 
 uint8_t motionInit(uint8_t ServoNo);
 uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks);
@@ -77,7 +78,8 @@ void ServoCtrl(uint8_t IsrCnt)
 	for(uint8_t i=0; i<SERVO_CNT; i++)
 	{
 		if( ServoData_GetMoveRequest(i) )
-			servoCtrlGoTo(i, IsrCnt);
+//			servoCtrlGoTo(i, IsrCnt);
+			servoCtrlGoTo_3(i, IsrCnt);
 	}
 }
 
@@ -142,69 +144,63 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 		w = alpha * t + w_0
 		s = alpha/2 * t^2 + w_0 * t + s_0
 		s = s(alpha,t) + s(w_0,t) + s_0
-	*/
-		/*
-		1. Beschleunigen
-			1.1 prüfen, ob Distanz für Bremsvorgang erreicht ist
-			  -> Ja: Bremsvorgang einleiten
-			  -> Nein: Prüfen ob targetSpeed erreicht
-			    -> Ja: Beschleunigung Ende - Gleichförmige Bewegung starten
-				-> Nein: Beschleunigung fortsetzen
-		2. Gleichförmige Bewegung
-			2.1 Prüfen ob Distanz für Bremsvorgang erreicht ist
-			  -> Ja: Bremsvorgang einleiten
-			  -> Nein: Gleichförmige Bewegung fortsetzen
-		3. Bremsvorgang
-			3.1 Prüfen ob Zielposition erreicht ist
-			  -> Ja: Bewegung beendet
-			  -> Nein: Bremsvorgang fortsetzen
-		*/
-		
-		// checking acc, position to start dec and calculating dec, if received value not valid
-		ServoData_SetMotionCtrlState(ServoNo, motionCtrl(ServoNo, Ticks) );
-
-		// calculating speed depending on motionPhase -> accelaration / constant / decelaration 
-		ServoData_SetCurrentSpeed(ServoNo, speedControl(ServoNo, Ticks) );		
-		
-		// waiting for next Step depwnding on calculated speed
-		if( stepCtrl(ServoNo, Ticks) )
+	*/	
+		if(ServoData_GetCurrentPosition(ServoNo) == ServoData_GetTargetPosition(ServoNo) )
 		{
-			ServoData_IncrementPoistion(ServoNo);
-			#if( SERVEO_CTRL_BOARD_AVAILABLE )
-				Servo(ServoNo, ServoData_GetCurrentPosition(ServoNo) );
-			#endif
+			ServoData_SetMotionCtrlState(ServoNo, MOTION_FINISHED );
 		}
-	
+		else
+		{
+			// checking acc, position to start dec and calculating dec, if received value not valid
+			ServoData_SetMotionCtrlState(ServoNo, motionCtrl(ServoNo, Ticks) );
+
+			// calculating speed depending on motionPhase -> accelaration / constant / decelaration 
+			ServoData_SetCurrentSpeed(ServoNo, speedControl(ServoNo, Ticks) );		
+		
+			// waiting for next Step depwnding on calculated speed
+			if( stepCtrl(ServoNo, Ticks) )
+			{
+				ServoData_IncrementPoistion(ServoNo);
+				#if( SERVEO_CTRL_BOARD_AVAILABLE )
+					Servo(ServoNo, ServoData_GetCurrentPosition(ServoNo) );
+				#endif
+			}
+		}
 		break;
 		
 	////	Go to MIN	////////////////////////////////////////////////////////////
 	case GO_TO_MIN:
 	
-		// checking acc, position to start dec, calculating dec, if received value not valid
-		ServoData_SetMotionCtrlState(ServoNo, motionCtrl(ServoNo, Ticks) );
-
-		// calculating speed depending on acc / decelaration
-		ServoData_SetCurrentSpeed(ServoNo, speedControl(ServoNo, Ticks));
-	
-		// waiting for next Step depwnding on calculated speed
-		if( stepCtrl(ServoNo, Ticks) )
+		if(ServoData_GetCurrentPosition(ServoNo) == ServoData_GetTargetPosition(ServoNo) )
 		{
-			ServoData_DecrementPoistion(ServoNo);
-			#if( SERVEO_CTRL_BOARD_AVAILABLE )
-			Servo(ServoNo, ServoData_GetCurrentPosition(ServoNo) );
-			#endif
+			ServoData_SetMotionCtrlState(ServoNo, MOTION_FINISHED );
 		}
-	
-		break;
+		else
+		{
+			// checking acc, position to start dec, calculating dec, if received value not valid
+			ServoData_SetMotionCtrlState(ServoNo, motionCtrl(ServoNo, Ticks) );
 
-	////	STOP due to reversal of movement	////////////////////////////////////
-	case GO_TO_REVERT:
-	
+			// calculating speed depending on acc / decelaration
+			ServoData_SetCurrentSpeed(ServoNo, speedControl(ServoNo, Ticks));
+		
+			// waiting for next Step depwnding on calculated speed
+			if( stepCtrl(ServoNo, Ticks) )
+			{
+				ServoData_DecrementPoistion(ServoNo);
+				#if( SERVEO_CTRL_BOARD_AVAILABLE )
+				Servo(ServoNo, ServoData_GetCurrentPosition(ServoNo) );
+				#endif
+			}
+		}
 		break;
 
 	////	EMERGENCY STOP	////////////////////////////////////////////////////////
 	case EMERGENCY_STOP:
-	
+		ServoData_SetCurrentSpeed(ServoNo, 0);
+		ServoData_SetSpeedCtrlInitDone(ServoNo, FALSE);
+		ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
+		ServoData_SetMotionCtrlState(ServoNo, MOTION_INIT);
+		ServoData_SetMotionPhase(ServoNo, MoPha_OFF);
 		break;
 
 	////	END		////////////////////////////////////////////////////////////////
@@ -214,7 +210,7 @@ uint8_t servoCtrlGoTo_3(uint8_t ServoNo, uint8_t Ticks)
 		ServoData_SetSpeedCtrlInitDone(ServoNo, FALSE);
 		ServoData_SetStepCtrlInitDone(ServoNo, FALSE);
 		ServoData_SetMotionCtrlState(ServoNo, MOTION_INIT);
-		ServoData_SetMotionPhase(ServoNo, 0);
+		ServoData_SetMotionPhase(ServoNo, MoPha_OFF);
 		return FALSE;
 	}
 
@@ -238,18 +234,23 @@ uint8_t motionInit(uint8_t ServoNo)
 	if( ServoData_GetTargetSpeed( ServoNo ) > SPEED_MAX )
 		ServoData_SetTargetSpeed( ServoNo, SPEED_MAX );
 
+	uint8_t retVal = 0;
+	
 	// 	Checking the moving direction
 	if( ServoData_GetCurrentPosition(ServoNo) < ServoData_GetTargetPosition(ServoNo) )
-		return GO_TO_MAX;			////	Go to MAX
-			
+	{
+		retVal = GO_TO_MAX;											////	Go to MAX
+		ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// Starting with acceleration phase
+	}
 	else if( ServoData_GetCurrentPosition(ServoNo) > ServoData_GetTargetPosition(ServoNo) )
-		return GO_TO_MIN;			////	Go to MIN
-	
-	// Starting with acceleration phase 
-	ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);
-			
-	return MOTION_FINISHED;			////	END
-
+	{
+		retVal = GO_TO_MIN;											////	Go to MIN
+		ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// Starting with acceleration phase
+	}
+	else
+		retVal = MOTION_FINISHED;	////	END
+				
+	return retVal;
 }
 
 uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
@@ -257,8 +258,12 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	// 1. Checking declaration and breaking distance
 	uint8_t RetVal = 0;
 
+	servoData tmpServoData;
+	ServoData_GetServoData(ServoNo, &tmpServoData);
 	
-	uint16_t currentPosi = ServoData_GetCurrentPosition(ServoNo);
+	uint16_t stepsForStop = stepsToStop[ ServoData_GetDecelaration(ServoNo)-1 ][ ServoData_GetCurrentSpeed(ServoNo)-1 ];
+	
+/*	uint16_t currentPosi = ServoData_GetCurrentPosition(ServoNo);
 	uint16_t targetPosi = ServoData_GetTargetPosition(ServoNo);
 	
 	uint8_t currentSpeed = ServoData_GetCurrentSpeed(ServoNo);
@@ -270,27 +275,27 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	
 	uint8_t motionCtrlState = ServoData_GetMotionCtrlState( ServoNo );
 	uint8_t motionPhase = ServoData_GetMotionPhase( ServoNo );
-	
-	switch( motionPhase )
+*/	
+	switch( tmpServoData.motionPhase )
 	{
 	/***	Phase 1 - Accelaration	***/
 	case MoPha_AccToTargetSpeed:
 		/* 1) if Acc == 0 -> switch direct to Phase 2 without Acc-Phase */
-		if( accelaration == 0 )		// 
+		if( tmpServoData.acceleration == 0 )		// 
 		{
 			ServoData_SetMotionPhase( ServoNo, MoPha_UniformMoving );	// Uniform movement
-			RetVal = motionCtrlState;	// No change of motionCtrlState
+			RetVal = tmpServoData.servoMotionCtrl_State;	// No change of motionCtrlState
 		}
 		/* 2) Moving direction to Servo Max Position */
-		else if( GO_TO_MAX == motionCtrlState )
+		else if( GO_TO_MAX == tmpServoData.servoMotionCtrl_State )
 		{	
 			/* a) if the direction changes	*/
-			if ( currentPosi > targetPosi ) 
+			if ( tmpServoData.currentPosition > tmpServoData.targetPosition ) 
 			{
-				if( (decelaration != 0) && (currentSpeed > 0) )
+				if( (tmpServoData.deceleration != 0) && (tmpServoData.currentSpeed > 0) )
 				{	
 					ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-					RetVal = motionCtrlState;	// No change of motionCtrlState	
+					RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State	
 				}
 				else // no decelaration -> directly go on into other direction
 				{
@@ -299,25 +304,25 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition >= tmpServoData.targetPosition - stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase 
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 
 		/* 3) Moving direction to Servo Min Position */
-		else if( GO_TO_MIN == motionCtrlState )
+		else if( GO_TO_MIN == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi < targetPosi )
+			if ( tmpServoData.currentPosition < tmpServoData.targetPosition )
 			{
-				if( decelaration != 0 )
+				if( tmpServoData.deceleration != 0 )
 				{
-					if ( currentSpeed > 0)
+					if ( tmpServoData.currentSpeed > 0)
 					{
 						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-						RetVal = motionCtrlState;	// No change of motionCtrlState
+						RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 					}
 					else
 					{
@@ -332,33 +337,33 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition <= tmpServoData.targetPosition + stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		/* 4. independent of moving direction */
 		else
 		{			
 			/* a) target speed is reached */
-			if( currentSpeed == targetSpeed )
+			if( tmpServoData.currentSpeed == tmpServoData.targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_UniformMoving);	// Uniform movement
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 			/* b) currentSpeed > targetSpeed */
-			else if( currentSpeed > targetSpeed )
+			else if( tmpServoData.currentSpeed > tmpServoData.targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 					
 			}
 			/* c) accelaration progress */
 			else
 			{
 				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		
@@ -368,17 +373,17 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	case MoPha_UniformMoving:
 	
 		/* 1) Moving direction to Servo Max Position */
-		if( GO_TO_MAX == motionCtrlState )
+		if( GO_TO_MAX == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi > targetPosi )
+			if ( tmpServoData.currentPosition > tmpServoData.targetPosition )
 			{
-				if( decelaration != 0 )
+				if( tmpServoData.deceleration != 0 )
 				{
-					if ( currentSpeed > 0)
+					if ( tmpServoData.currentSpeed > 0)
 					{
 						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-						RetVal = motionCtrlState;	// No change of motionCtrlState
+						RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 					}
 					else
 					{
@@ -393,24 +398,24 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition >= tmpServoData.targetPosition - stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		/* 2) Moving direction to Servo Min Position */
-		else if( GO_TO_MIN == motionCtrlState )
+		else if( GO_TO_MIN == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi < targetPosi )
+			if ( tmpServoData.currentPosition < tmpServoData.targetPosition )
 			{
-				if( decelaration != 0 )
+				if( tmpServoData.deceleration != 0 )
 				{
-					if ( currentSpeed > 0)
+					if ( tmpServoData.currentSpeed > 0)
 					{
 						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-						RetVal = motionCtrlState;	// No change of motionCtrlState
+						RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 					}
 					else
 					{
@@ -425,10 +430,10 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition <= tmpServoData.targetPosition + stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 
 		}
@@ -436,24 +441,22 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 		else
 		{
 			/* a) currentSpeed > targetSpeed */
-			if( currentSpeed > targetSpeed )
+			if( tmpServoData.currentSpeed > tmpServoData.targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState
-			
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 			/* b) currentSpeed < targetSpeed */
-			else if( currentSpeed < targetSpeed )
+			else if( tmpServoData.currentSpeed < tmpServoData.targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState
-			
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State			
 			}
 			/* c) uniform moving in progress */
 			else
 			{
 				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		break;
@@ -461,15 +464,15 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	/***	Phase 3 - Deceleration to target Speed	***/
 	case MoPha_DecToTargetSpeed:
 		/* 1) Moving direction to Servo Max Position */
-		if( GO_TO_MAX == motionCtrlState )
+		if( GO_TO_MAX == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi > targetPosi )
+			if ( tmpServoData.currentPosition > tmpServoData.targetPosition )
 			{
-				if( (decelaration != 0) && (currentSpeed > 0) )
+				if( (tmpServoData.deceleration != 0) && (tmpServoData.currentSpeed > 0) )
 				{
 					ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-					RetVal = motionCtrlState;	// No change of motionCtrlState
+					RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 				}
 				else // no decelaration -> directly go on into other direction
 				{
@@ -478,22 +481,22 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition >= tmpServoData.targetPosition - stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		/* 2) Moving direction to Servo Min Position */
-		else if( GO_TO_MIN == motionCtrlState )
+		else if( GO_TO_MIN == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi > targetPosi )
+			if ( tmpServoData.currentPosition > tmpServoData.targetPosition )
 			{
-				if( (decelaration != 0) && (currentSpeed > 0) )
+				if( (tmpServoData.deceleration != 0) && (tmpServoData.currentSpeed > 0) )
 				{
 					ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-					RetVal = motionCtrlState;	// No change of motionCtrlState
+					RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 				}
 				else // no decelaration -> directly go on into other direction
 				{
@@ -502,32 +505,32 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi >= targetPosi - stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition >= tmpServoData.targetPosition - stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		/* 3. independent of moving direction */
 		else
 		{
 			/* a) currentSpeed < targetSpeed */
-			if( currentSpeed < targetSpeed )
+			if( tmpServoData.currentSpeed < tmpServoData.targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_AccToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 			/* b) currentSpeed > targetSpeed */
-			else if( currentSpeed > targetSpeed )
+			else if( tmpServoData.currentSpeed > tmpServoData.targetSpeed)
 			{
 				// not needed ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState			
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State			
 			}
 			/* c) uniform moving in progress */
 			else
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_UniformMoving);	// going on with uniform movement
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		break;
@@ -535,17 +538,17 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	/***	Phase 4 - Deceleration to Stop	***/
 	case MoPha_DecToStop:
 		/* 1) Moving direction to Servo Max Position */
-		if( GO_TO_MAX == motionCtrlState )
+		if( GO_TO_MAX == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi < targetPosi )
+			if ( tmpServoData.currentPosition < tmpServoData.targetPosition )
 			{
-				if( decelaration != 0 )
+				if( tmpServoData.deceleration != 0 )
 				{
-					if ( currentSpeed > 0)
+					if ( tmpServoData.currentSpeed > 0)
 					{
 						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-						RetVal = motionCtrlState;	// No change of motionCtrlState
+						RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 					}
 					else
 					{
@@ -560,24 +563,24 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition <= tmpServoData.targetPosition + stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		/* 2) Moving direction to Servo Min Position */
-		else if( GO_TO_MIN == motionCtrlState )
+		else if( GO_TO_MIN == tmpServoData.servoMotionCtrl_State )
 		{
 			/* a) if the direction changes	*/
-			if ( currentPosi < targetPosi )
+			if ( tmpServoData.currentPosition < tmpServoData.targetPosition )
 			{
-				if( decelaration != 0 )
+				if( tmpServoData.deceleration != 0 )
 				{
-					if ( currentSpeed > 0)
+					if ( tmpServoData.currentSpeed > 0)
 					{
 						ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase before changing direction
-						RetVal = motionCtrlState;	// No change of motionCtrlState
+						RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 					}
 					else
 					{
@@ -592,26 +595,26 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 				}
 			}
 			/* b) if requiredBrakingDistance is reached before reaching targetSpeed */
-			else if( (decelaration != 0) && (currentPosi <= targetPosi + stepsForStop) )
+			else if( (tmpServoData.deceleration != 0) && (tmpServoData.currentPosition <= tmpServoData.targetPosition + stepsForStop) )
 			{
 				ServoData_SetMotionPhase( ServoNo, MoPha_DecToStop );	// Breaking Phase
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}
 		/* 3. independent of moving direction */
 		else
 		{
 			/* a) currentSpeed > targetSpeed */
-			if( currentSpeed > targetSpeed )
+			if( tmpServoData.currentSpeed > tmpServoData.targetSpeed )
 			{
 				ServoData_SetMotionPhase(ServoNo, MoPha_DecToTargetSpeed);	// dec because of chmaged target speed
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 			/* b) uniform moving in progress */
 			else
 			{
 				// nicht nötig	ServoData_SetMotionPhase(ServoNo, MoPha_ACC);	// going on with ACC
-				RetVal = motionCtrlState;	// No change of motionCtrlState
+				RetVal = tmpServoData.servoMotionCtrl_State;	// No change of tmpServoData.servoMotionCtrl_State
 			}
 		}	
 		break;
@@ -622,6 +625,62 @@ uint8_t motionCtrl(uint8_t ServoNo, uint8_t Ticks)
 	}
 
 	return RetVal;
+}
+
+uint8_t speedControl(uint8_t ServoNo, uint8_t Ticks)
+{
+	servoData tmpServoData;
+	ServoData_GetServoData(ServoNo, &tmpServoData);
+
+	uint8_t retVal = tmpServoData.currentSpeed;
+
+	// Init stepCtrl	////////////////////////////////////////////////////
+	if( tmpServoData.speedCtrlInitDone == FALSE )
+	{
+		ServoData_SetSpeedCtrlInitDone(ServoNo, TRUE);
+		ServoData_SetSpeedDelayTicksToggle(ServoNo, Ticks);
+		ServoData_SetSpeedDelayTicksCnt(ServoNo, 0);
+	}
+
+	// Check if Ticks increased	////////////////////////////////////////////
+	if( tmpServoData.speedDelayTicksToggle != Ticks )
+	{
+		// Ticks overflow
+		if( tmpServoData.speedDelayTicksToggle > Ticks )
+		{
+			ServoData_SetSpeedDelayTicksCnt( ServoNo, tmpServoData.speedDelayTicksCnt + (0xFF - tmpServoData.speedDelayTicksToggle) + Ticks );
+			//servoArr[ServoNo].stepDelayTicksCnt += (255 - servoArr[ServoNo].stepDelayTicksToggle) + Ticks;
+		}
+		// No overflowveloTicksDefault
+		else
+		{
+			ServoData_SetSpeedDelayTicksCnt(ServoNo, tmpServoData.speedDelayTicksCnt +  Ticks -  tmpServoData.speedDelayTicksToggle);
+			//servoArr[ServoNo].stepDelayTicksCnt += Ticks - servoArr[ServoNo].stepDelayTicksToggle;
+		}
+		ServoData_SetSpeedDelayTicksToggle(ServoNo, Ticks);
+	}
+	
+	// veloTicksCntr reaches default value	////////////////////////////////////
+	if( tmpServoData.speedDelayTicksCnt >=  veloTicksDefault[tmpServoData.currentSpeed] )
+	{
+		// Save passed Ticks for next cycle
+		ServoData_SetSpeedDelayTicksCnt(ServoNo, tmpServoData.speedDelayTicksCnt - veloTicksDefault[tmpServoData.currentSpeed] );
+		
+		if( MoPha_AccToTargetSpeed == tmpServoData.motionPhase )
+		{
+			//ServoData_SetCurrentSpeed( ServoNo, ++(tmpServoData.currentSpeed) );
+			retVal = ++(tmpServoData.currentSpeed);
+		}
+		else if( MoPha_DecToTargetSpeed == tmpServoData.motionPhase ||
+				 MoPha_DecToStop == tmpServoData.motionPhase
+			)
+		{
+			//ServoData_SetCurrentSpeed( ServoNo, --(tmpServoData.currentSpeed) );
+			retVal = --(tmpServoData.currentSpeed);
+		}
+	}
+	
+	return retVal;
 }
 
 uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)
@@ -639,11 +698,17 @@ uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)
 	{
 		// Ticks overflow
 		if( ServoData_GetStepDelayTicksToggle(ServoNo) > Ticks )
-			ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) + 255 - ServoData_GetStepDelayTicksToggle(ServoNo) );
+		{
+			ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) + (255 - ServoData_GetStepDelayTicksToggle(ServoNo)) + Ticks );
+			//servoArr[ServoNo].stepDelayTicksCnt += (255 - servoArr[ServoNo].stepDelayTicksToggle) + Ticks;
+
+		}
 		// No overflowveloTicksDefault
 		else
-			ServoData_SetStepDelayTicksCnt(ServoNo, Ticks - ServoData_GetStepDelayTicksCnt(ServoNo) );
-		
+		{
+			ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) + Ticks - ServoData_GetStepDelayTicksToggle(ServoNo) );
+			//servoArr[ServoNo].stepDelayTicksCnt += Ticks - servoArr[ServoNo].stepDelayTicksToggle;
+		}
 		ServoData_SetStepDelayTicksToggle(ServoNo, Ticks);
 	}
 	
@@ -651,41 +716,7 @@ uint8_t stepCtrl(uint8_t ServoNo, uint8_t Ticks)
 	if(ServoData_GetStepDelayTicksCnt(ServoNo) >=  veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] )
 	{
 		// Save passed Ticks for next cycle
-		ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) - veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] );
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-uint8_t speedControl(uint8_t ServoNo, uint8_t Ticks)
-{
-	// Init stepCtrl	////////////////////////////////////////////////////
-	if( ServoData_GetSpeedCtrlInitDone(ServoNo) == FALSE )
-	{
-		ServoData_SetSpeedCtrlInitDone(ServoNo, TRUE);
-		ServoData_SetSpeedDelayTicksToggle(ServoNo, Ticks);
-		ServoData_SetSpeedDelayTicksCnt(ServoNo, 0);
-	}
-
-	// Check if Ticks increased	////////////////////////////////////////////
-	if( ServoData_GetSpeedDelayTicksToggle(ServoNo) != Ticks )
-	{
-		// Ticks overflow
-		if( ServoData_GetSpeedDelayTicksToggle(ServoNo) > Ticks )
-			ServoData_SetSpeedDelayTicksCnt(ServoNo, ServoData_GetSpeedDelayTicksCnt(ServoNo) + 255 - ServoData_GetSpeedDelayTicksToggle(ServoNo) );
-		// No overflowveloTicksDefault
-		else
-			ServoData_SetSpeedDelayTicksCnt(ServoNo, Ticks - ServoData_GetSpeedDelayTicksCnt(ServoNo) );
-		
-		ServoData_SetSpeedDelayTicksToggle(ServoNo, Ticks);
-	}
-	
-	// veloTicksCntr reaches default value	////////////////////////////////////
-	if(ServoData_GetSpeedDelayTicksCnt(ServoNo) >=  veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] )
-	{
-		// Save passed Ticks for next cycle
-		ServoData_SetSpeedDelayTicksCnt(ServoNo, ServoData_GetSpeedDelayTicksCnt(ServoNo) - veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo)] );
+		ServoData_SetStepDelayTicksCnt(ServoNo, ServoData_GetStepDelayTicksCnt(ServoNo) - veloTicksDefault[ServoData_GetCurrentSpeed(ServoNo )] );
 		return TRUE;
 	}
 	
