@@ -68,6 +68,6 @@ dkms.conf
 Debug/
 
 #gtest files
-gtest/build/
-gtest/.vscode/
-gtest/doc/html/
+03_gtest/build/
+03_gtest/.vscode/
+03_gtest/doc/html/
