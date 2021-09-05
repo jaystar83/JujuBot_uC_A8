@@ -97,6 +97,7 @@ uint16_t ServoData_GetStepDelayTicksCnt(uint8_t ServoNo);
 uint16_t ServoData_GetStepDelayTicksToggle(uint8_t ServoNo);
 uint8_t ServoData_GetStepCtrlInitDone(uint8_t ServoNo);
 
+uint8_t ServoData_SetServoData(uint8_t ServoNo, servoData *ServoCtrlData);
 
 uint8_t ServoData_SetMotionCtrlState(uint8_t ServoNo, uint8_t State);
 

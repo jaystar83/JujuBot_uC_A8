@@ -238,6 +238,35 @@ uint8_t ServoData_GetStepCtrlInitDone(uint8_t ServoNo)
 
 
 //// SETTER	////
+uint8_t ServoData_SetServoData(uint8_t ServoNo, servoData *ServoCtrlData)
+{
+	servoArr[ServoNo].servoNo			= ServoCtrlData->servoNo;
+	servoArr[ServoNo].moveRequest		= ServoCtrlData->moveRequest;
+
+	servoArr[ServoNo].targetPosition	= ServoCtrlData->targetPosition;
+	servoArr[ServoNo].targetSpeed		= ServoCtrlData->targetSpeed;
+	servoArr[ServoNo].acceleration		= ServoCtrlData->acceleration;
+	servoArr[ServoNo].deceleration		= ServoCtrlData->deceleration;
+
+	servoArr[ServoNo].currentPosition	= ServoCtrlData->currentPosition;
+	servoArr[ServoNo].currentSpeed		= ServoCtrlData->currentSpeed;
+
+	//// Data for ServoCtrlGoTo	////
+	servoArr[ServoNo].servoMotionCtrl_State = ServoCtrlData->servoMotionCtrl_State;
+	servoArr[ServoNo].motionPhase			= ServoCtrlData->motionPhase;
+
+	//// Data for speed ctrl	////
+	servoArr[ServoNo].speedDelayTicksCnt	= ServoCtrlData->speedDelayTicksCnt;
+	servoArr[ServoNo].speedDelayTicksToggle	= ServoCtrlData->speedDelayTicksToggle;
+	servoArr[ServoNo].speedCtrlInitDone		= ServoCtrlData->speedCtrlInitDone;
+
+	//// Data for step ctrl	////
+	servoArr[ServoNo].stepDelayTicksCnt		= ServoCtrlData->stepDelayTicksCnt;
+	servoArr[ServoNo].stepDelayTicksToggle	= ServoCtrlData->stepDelayTicksToggle;
+	servoArr[ServoNo].stepCtrlInitDone		= ServoCtrlData->stepCtrlInitDone;
+	
+	return TRUE;
+}
 uint8_t ServoData_SetMotionCtrlState(uint8_t ServoNo, uint8_t State)
 {
 	if(ServoNo >= SERVO_CNT)

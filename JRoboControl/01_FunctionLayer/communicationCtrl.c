@@ -52,6 +52,7 @@ uint8_t CommunicationCtrl()
 
 	if( uart_getData(serialReadBuffer) )
 	{
+		////	CRC - Verification	- If it fails send Error message
 		if( !(CRC_verification(serialReadBuffer)) )
 		{
 			serialSendBuffer[0] = 255;	// ID - Error message
@@ -173,6 +174,13 @@ void uart_writeServoData(uint8_t ServoNo)
 	uart_putc('0'+ (ServoData_GetCurrentSpeed(ServoNo))%10);
 	uart_putc('\r');uart_putc('\n');
 	
+	uart_puts("curAcc: ");
+	uart_putc('0'+ (ServoData_GetAcceleration(ServoNo)) );
+	uart_putc('\r');uart_putc('\n');
+	uart_puts("curDec: ");
+	uart_putc('0'+ (ServoData_GetDecelaration(ServoNo)) );
+	uart_putc('\r');uart_putc('\n');
+
 	return;
 }
 
