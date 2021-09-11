@@ -23,6 +23,9 @@
 #ifndef SERIAL_MESSAGE_LENGTH
 	#define SERIAL_MESSAGE_LENGTH 12
 #endif
+#ifndef SERIAL_RxISR_ENABLE
+	#define SERIAL_RxISR_ENABLE TRUE
+#endif
 
 #ifndef CRC_CHECK_OFF
 	#define CRC_CHECK_OFF

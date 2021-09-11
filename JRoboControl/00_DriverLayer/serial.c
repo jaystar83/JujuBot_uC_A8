@@ -13,7 +13,7 @@ unsigned char *WdAllert;
 
 
 // Initialisiet UART gegebener oszillatorfrequenz udn Baudrate
-void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned char DataLength, unsigned char *WdAllert)
+void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned char DataLength, unsigned char *WdAllert, unsigned char RxReadyISR_Enable)
 {
 	// Reset UART	/////////////////////////////////////
 	//	UCSR0A - Register
@@ -82,6 +82,11 @@ void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned ch
 	UCSR0C |= (1 << UMSEL01);	// ModeSelect 01 - Reserved -> muss gesetzt werden, weil UCSR0C beschrieben wird
 	UCSR0C |= (1 << UCSZ01);	// Character Size 011
 	UCSR0C |= (1 << UCSZ00);	// -> 8Bit
+	
+	if( RxReadyISR_Enable )
+	{
+		UCSR0B |= (1<<RXCIE0);	// Bit7 R/W	- RX Compl. Interrupt Enable	1 -> Enables Recive Interrupt
+	}
 }
 
 // Sendet 1 Byte an UART

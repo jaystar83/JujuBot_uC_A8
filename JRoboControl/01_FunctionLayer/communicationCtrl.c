@@ -36,7 +36,7 @@ uint8_t CommunicationCtrlInit()
 		wdCtrl.WD_Allert = 0;
 		*wdCtrl.WD_Allert = 0;
 
-		uart_init(F_CPU, BAUD, sizeof(serialReadBuffer), SERIAL_MESSAGE_LENGTH, wdCtrl.WD_Allert );
+		uart_init(F_CPU, BAUD, sizeof(serialReadBuffer), SERIAL_MESSAGE_LENGTH, wdCtrl.WD_Allert, SERIAL_RxISR_ENABLE );
 		
 		return TRUE;
 	}

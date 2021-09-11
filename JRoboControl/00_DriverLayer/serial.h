@@ -39,7 +39,7 @@ char errorHandlerFlags;
 ***********************************************************************/
 // Initialisiet UART gegebener oszillatorfrequenz udn Baudrate
 //void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned char DataLength);
-void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned char DataLength, unsigned char *WdAllert);
+void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned char DataLength, unsigned char *WdAllert, unsigned char RxReadyISR_Enable);
 
 // Sendet 1 Byte an UART
 void uart_putc(unsigned char data);
