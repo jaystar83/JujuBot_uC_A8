@@ -90,7 +90,7 @@ int main(void)
 
 	sei();	// aktiviert ISR
 
-	uart_puts("JRoboCtrl -V.0.0.1\r\n");
+	uart_puts("JRoboCtrl -V.0.0.2\r\n");
 
 /***********************************************************************
 	Application Code
