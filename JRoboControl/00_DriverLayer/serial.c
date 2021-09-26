@@ -8,9 +8,11 @@
 #include "serial.h"
 
 unsigned char readBufferLength = 50;
-unsigned char dataLength = 50;
+unsigned char dataLength = 20;
 unsigned char *WdAllert;
 
+unsigned char internalDataBuffer_ISR[SERIAL_MESSAGE_LENGTH] = { 0 };
+unsigned char iDB_index = 0;
 
 // Initialisiet UART gegebener oszillatorfrequenz udn Baudrate
 void uart_init(long Oszi, long Baud, unsigned char SizeOfReadBuffer, unsigned char DataLength, unsigned char *WdAllert, unsigned char RxReadyISR_Enable)
@@ -187,4 +189,38 @@ unsigned char uart_getData(uint8_t *DataBuffer)
 	}
 
 	return 1;
+}
+
+// Receive Data using ISR
+unsigned char uart_getData(uint8_t *DataBuffer, uint8_t *RxWD_Reset; uint8_t *RxDataISR_Active)
+{
+	/*
+	1. Wenn ISR_RxCompleted aufgerufen wird 
+		-> Daten auslesen
+		-> in Puffer schreiben
+		-> Puffer index erhöhen
+		-> Daten-Empfang = Aktiv setzen
+	2. Wenn Daten_Empfang abgeschlossen
+		-> 
+	*/
+	
+	internalDataBuffer_ISR[iDB_index] = UDR0;
+	iDB_index++;
+	*RxDataISR_Active = TRUE;
+	
+	if(iDB_index < SERIAL_MESSAGE_LENGTH)
+	{
+		return FALSE;
+	}
+	else
+	{
+		for(uint8_t i = 0; i<SERIAL_MESSAGE_LENGTH; i++)
+			*DataBuffer++ = internalDataBuffer_ISR[i];
+			
+		iDB_index = 0;
+		*RxDataISR_Active = FALSE;
+		*RxWD_Reset = TRUE;
+		
+		return TRUE;	}
+
 }
