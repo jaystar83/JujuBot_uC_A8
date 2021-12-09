@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<MDG.Technology version="1.0"><Documentation id="47C3E94F-3" name="c_Profiles" version="0.1" notes="c_Interface (from Interface), c_Module (from Class)"/><UMLProfiles><UMLProfile profiletype="uml2">
+			<Documentation id="47C3E94F-3" name="c_Profiles" version="1.0" notes="c_Interface (from Interface), c_Module (from Class)"/>
+			<Content>
+				<Stereotypes>
+					<Stereotype name="c_Module" metatype="c_Module" notes="" cx="0" cy="0" bgcolor="-1" fontcolor="-1" bordercolor="-1" borderwidth="-1" hideicon="0">
+						<Image type="EAShapeScript 1.0" xmlns:dt="urn:schemas-microsoft-com:datatypes" dt:dt="bin.base64">UEsDBBQAAAAIAFayiVOKCSvDkwAAAAIBAAAHABEAc3RyLmRhdFVUDQAHo4CyYaOAsmGjgLJh
+VY7NCoJAFIW/rUHv4NJASAdatWvjvjcYykoojUbKiN69c3WI4jJnLofzcwMnPFdqUi7aGlpe
+zJmREMT2HMSdNTs6YceNDMdKk8vjKONWsGCtf6lJpdmKrfQ24qe8vbyehxq8chvuyg/f/iz6
+J62hJSXy1OrupWo56gJTFrHRsNT/u/1fMYjNeY446FrbXbzoPeIHUEsBAhcLFAAAAAgAVrKJ
+U4oJK8OTAAAAAgEAAAcACQAAAAAAAAAAAACAAAAAAHN0ci5kYXRVVAUAB6OAsmFQSwUGAAAA
+AAEAAQA+AAAAyQAAAAAA</Image>
+						<AppliesTo>
+							<Apply type="Class">
+								<Property name="_AttInh" value="0"/>
+								<Property name="_AttPkg" value="0"/>
+								<Property name="_AttPri" value="1"/>
+								<Property name="_AttPro" value="0"/>
+								<Property name="_ConInh" value="0"/>
+								<Property name="_Constraint" value="1"/>
+								<Property name="_OpInh" value="0"/>
+								<Property name="_OpPkg" value="0"/>
+								<Property name="_OpPri" value="1"/>
+								<Property name="_OpPro" value="0"/>
+								<Property name="_OpPub" value="1"/>
+								<Property name="_Responsibility" value="1"/>
+								<Property name="_Tag" value="1"/>
+								<Property name="isActive" value=""/>
+							</Apply>
+						</AppliesTo>
+					</Stereotype>
+					<Stereotype name="c_Interface" metatype="c_Interface" notes="" cx="0" cy="0" bgcolor="-1" fontcolor="-1" bordercolor="-1" borderwidth="-1" hideicon="0">
+						<Image type="EAShapeScript 1.0" xmlns:dt="urn:schemas-microsoft-com:datatypes" dt:dt="bin.base64">UEsDBBQAAAAIABixiVMhOkiZlgAAAAQBAAAHABEAc3RyLmRhdFVUDQAHTH6yYUx+smFMfrJh
+VY7BCsJADETftYL/0GOFgnXRkzcv3v2DRasWtJVu0Yr47066RZSQ7DA7k0zgjOdGScpVqKLm
+xZQJCUFsx1HcRbWn0WxoyXAULMnlcaxUERk3Yy08V6XS7fSzVW/Ex50H+T0PXfHaXXHXjfDN
+kI3+qLVpmxJ5St3vpKo5KYUpi+FqnAu9v+g/RS825znMXjkNuzHRW/0BUEsBAhcLFAAAAAgA
+GLGJUyE6SJmWAAAABAEAAAcACQAAAAAAAAAAAACAAAAAAHN0ci5kYXRVVAUAB0x+smFQSwUG
+AAAAAAEAAQA+AAAAzAAAAAAA</Image>
+						<AppliesTo>
+							<Apply type="Interface">
+								<Property name="_AttInh" value="1"/>
+								<Property name="_AttPkg" value="0"/>
+								<Property name="_AttPri" value="0"/>
+								<Property name="_AttPro" value="0"/>
+								<Property name="_AttPub" value="1"/>
+								<Property name="_ConInh" value="0"/>
+								<Property name="_Constraint" value="1"/>
+								<Property name="_isVertical" value="True"/>
+								<Property name="_OpPkg" value="0"/>
+								<Property name="_OpPri" value="0"/>
+								<Property name="_OpPro" value="0"/>
+								<Property name="_OpPub" value="1"/>
+								<Property name="_PType" value="1"/>
+								<Property name="_ResInh" value="0"/>
+								<Property name="_Responsibility" value="1"/>
+								<Property name="_Tag" value="1"/>
+							</Apply>
+						</AppliesTo>
+					</Stereotype>
+				</Stereotypes>
+				<TaggedValueTypes/>
+			</Content>
+		</UMLProfile>
+	</UMLProfiles></MDG.Technology>
