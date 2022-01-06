@@ -1,6 +1,9 @@
 #include "functions.h"
 #include <stdio.h>
-int callback(const void* msg)
+
+#define StdReturnType uint8_t
+
+StdReturnType callback(const void* msg)
 {
     printf("callback, msg = %d\r\n",*(int*)msg);
 
@@ -88,11 +91,11 @@ uint8_t TxBufferGet_Posi = 0;   // position to send the next message
 
 int main()
 {
-    int (*notification)(const void* msg);
+    StdReturnType (*inputNotification)(const void* msg);
 
-    int RegNotifyCallback(int (*cb)(const void *msg))
+    StdReturnType RegNotifyCallback( StdReturnType (*NotifyCallback)(const void *msg)   )
     {
-        notification = cb;
+        inputNotification = NotifyCallback;
         return 0;
     }
 
@@ -115,7 +118,7 @@ int main()
     {
         printf("Zahl (0=Ende): ");
         scanf("%d",&input);
-        notification(&input);
+        inputNotification(&input);
     }
     
 
