@@ -71,3 +71,7 @@ Debug/
 03_gtest/build/
 03_gtest/.vscode/
 03_gtest/doc/html/
+
+#EA files
+02_EA Modell/JujuBot.ldb
+02_EA Modell/HTML_Export/
