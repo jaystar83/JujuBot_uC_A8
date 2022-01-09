@@ -67,6 +67,11 @@ dkms.conf
 *.componentinfo.xml
 Debug/
 
+#cMake files
+03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/
+03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/.vscode/
+03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/doc/html/
+
 #gtest files
 gtest/build/
 gtest/.vscode/
