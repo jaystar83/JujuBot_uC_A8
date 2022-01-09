@@ -68,9 +68,9 @@ dkms.conf
 Debug/
 
 #gtest files
-03_gtest/build/
-03_gtest/.vscode/
-03_gtest/doc/html/
+gtest/build/
+gtest/.vscode/
+gtest/doc/html/
 
 #EA files
 02_EA Modell/JujuBot.ldb

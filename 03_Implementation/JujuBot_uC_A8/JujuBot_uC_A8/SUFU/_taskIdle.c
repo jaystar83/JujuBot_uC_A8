@@ -9,6 +9,6 @@
 
 void taskIdle(uint8_t IsrTimer2Ticks)
 {
-	CommunicationCtrl();
-	ServoCtrl(IsrTimer2Ticks);
+//	CommunicationCtrl();
+//	ServoCtrl(IsrTimer2Ticks);
 }

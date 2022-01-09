@@ -8,8 +8,8 @@
 #include "_task1ms.h"
 
 #include "auxiliaryFunctions.h"
-#include "servoMotionCtrl.h"
-#include "serial.h"
+//#include "servoMotionCtrl.h"
+//#include "serial.h"
 
 uint8_t msToggleCompare = 0;
 
@@ -19,7 +19,7 @@ void task1ms(uint8_t MsToggle)
 	{
 		msToggleCompare = MsToggle;
 				
-		SercoCtrl_CheckMoveRequest();
+//		SercoCtrl_CheckMoveRequest();
 		
 /*		servoCtrlGoTo(ServoDataPtr);
 		ServoDataPtr++;
