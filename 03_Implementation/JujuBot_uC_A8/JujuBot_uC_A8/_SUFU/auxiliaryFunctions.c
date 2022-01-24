@@ -31,6 +31,7 @@ debounceData_t debounce_PortD_Pin7;
 ***********************************************************************/
 void EA_Init()
 {
+#if(SW_TEST_ACTIVE == FALSE)	
 //***	DIG-I/O	*****************************************************
 	//	DDRB	|= 1 << 5;	// Pin 5 von Port B als Ausgang# verwenden	-> (Board LED)
 
@@ -46,6 +47,7 @@ void EA_Init()
 	PORTD	|= (1 << 5);	// Pull-Up Widerstand aktiviert
 	PORTD	|= (1 << 6);	// Pull-Up Widerstand aktiviert
 	PORTD	|= (1 << 7);	// Pull-Up Widerstand aktiviert
+#endif
 }
 
 uint8_t debouncer(uint8_t PortByte, uint8_t PinNo, uint8_t DebounceCycles, uint8_t* DebounceCycleCntr)

@@ -92,7 +92,7 @@
 	TEST MODIFICATIONS
 ***********************************************************************/
 #ifndef SW_TEST_ACTIVE
-	#define  SW_TEST_ACTIVE FALSE
+	#define  SW_TEST_ACTIVE TRUE
 #endif	
 
 #endif // _DEFINES_H_

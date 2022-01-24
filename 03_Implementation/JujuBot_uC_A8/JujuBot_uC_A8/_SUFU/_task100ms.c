@@ -30,7 +30,9 @@ void task100ms(uint8_t _100msCntInput)
 		_1sCnt++;
 		if(_1sCnt >= 10)
 		{
+			#if(SW_TEST_ACTIVE == FALSE)
 			TOOGLE_BIT(PORTC,PORTC0);	// -> (Green LED)
+			#endif	
 //			TOOGLE_BIT(PORTB,PORTB5);	// -> (Board LED)
 
 			_1sCnt = 0;

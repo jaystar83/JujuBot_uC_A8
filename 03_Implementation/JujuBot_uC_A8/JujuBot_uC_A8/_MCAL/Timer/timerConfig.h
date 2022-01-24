@@ -13,11 +13,8 @@
 /***********************************************************************
 	ICNLUDES
 ***********************************************************************/
-#if( SW_TEST_ACTIVE )
-	#include "_test_avrio.h"
-#else
-	#include <avr/io.h>
-#endif
+#include <avr/io.h>
+
 
 
 #ifndef TIMERCONFIG_H_

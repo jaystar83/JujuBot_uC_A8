@@ -9,7 +9,7 @@
 #ifndef _TEST_AVRIO_H_
 #define _TEST_AVRIO_H_
 
-typedef unsigned short uint8_t;
+typedef unsigned char uint8_t;
 typedef unsigned int uint16_t;
 typedef unsigned long uint32_t;
 
