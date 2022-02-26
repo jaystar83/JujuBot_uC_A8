@@ -71,6 +71,8 @@ Debug/
 03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/
 03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/.vscode/
 03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/doc/html/
+03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/doc/latex/
+c/
 
 #gtest files
 gtest/build/

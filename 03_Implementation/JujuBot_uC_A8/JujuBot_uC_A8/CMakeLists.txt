@@ -1,3 +1,13 @@
+###########################################################################
+# To setup build evirement
+# 1. install python3
+# 2. install msys2
+# 3. install additional packes
+#   - $ pacman -Suyy
+#   - $ pacman -S base-devel gcc cmake doxygen mingw-w64-x86_64-graphviz mingw-w64-x86_64-python mingw-w64-x86_64-python-pip
+###########################################################################
+
+
 project(JujuBot_uC_A8)
 cmake_minimum_required(VERSION 3.00)
 set(CMAKE_CXX_STANDARD 11)
@@ -14,6 +24,9 @@ message("")
 message("> BuildUnitTests     ON OFF")
 message("                     ^^")
 message("")
+message("> GenerateDocu       ON OFF")
+message("                        ^^^")
+message("")
 message("> GeneratePDFDoc     ON OFF")
 message("                        ^^^")
 message("")
@@ -27,6 +40,7 @@ message("")
 
 option(RunCPPCheck "RunCPPCheck" OFF)
 option(BuildUnitTests "BuildUnitTests" ON)
+option(GenerateDocu "GenerateDocu" ON)
 option(GeneratePDFDoc "GeneratePDFDoc" OFF)
 
 # call "cmake -DLOG_LEVEL=DEBUG .." with the desired log level to enable debugging
@@ -81,16 +95,16 @@ target_compile_options(main PRIVATE -Wall)
 
 #---    Testing ---
 # build unittests if requested
-if(BuildUnitTests EQUAL ON)
+if(BuildUnitTests)
+    message("### USER COMMENT: Configuring UnitTest.exe ###")
     add_subdirectory(_TestAndSim)
-    message(STATUS "Compiling unit tests")
-elseif()
-    message(STATUS "NOT compiling unit tests")
+else()
+    message("### USER COMMENT: NOT configuring UnitTest.exe ###")
 endif()
 
 
 # run cppcheck if requested
-if(RunCPPCheck EQUAL ON)
+if(RunCPPCheck)
     find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
     if (CMAKE_CXX_CPPCHECK)
         list(
@@ -105,47 +119,53 @@ endif()
 
 
 # build documentation if possible
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    message(STATUS "Doxygen found - building documentation")
-    set(DOXYGEN_HTML_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile_html.in)
-    set(DOXYGEN_HTML_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile_html)
+#if(GenerateDocu EQUAL ON)
+if(GenerateDocu)
+    # pacman -S doxygen mingw-w64-x86_64-graphviz
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
+        message(STATUS "Doxygen found - building documentation")
+        set(DOXYGEN_HTML_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile_html.in)
+        set(DOXYGEN_HTML_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile_html)
 
-    configure_file(${DOXYGEN_HTML_IN} ${DOXYGEN_HTML_OUT} @ONLY)
+        configure_file(${DOXYGEN_HTML_IN} ${DOXYGEN_HTML_OUT} @ONLY)
 
-    add_custom_target( doc_doxygen_html ALL
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_HTML_OUT}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
-        VERBATIM )
-
-    # pdf generation may require the following packages installed:
-    #  sudo apt-get install texlive-latex-base
-    #  sudo apt-get install texlive-latex-recommended
-    #  sudo apt-get install texlive-latex-extra
-    #  pacman -S mingw-w64-x86_64-texlive-latex-base mingw-w64-x86_64-texlive-latex-recommended mingw-w64-x86_64-texlive-latex-extra
-    if(GeneratePDFDoc EQUAL ON)
-        set(DOXYGEN_PDF_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile_pdf.in)
-        set(DOXYGEN_PDF_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile_pdf)
-
-        configure_file(${DOXYGEN_PDF_IN} ${DOXYGEN_PDF_OUT} @ONLY)
-
-        add_custom_target( doc_doxygen_tex ALL
-            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_PDF_OUT}
+        add_custom_target( doc_doxygen_html ALL
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_HTML_OUT}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
             VERBATIM )
 
-        string(TIMESTAMP TS "%Y%m%d")
+        # pdf generation may require the following packages installed:
+        #  sudo apt-get install texlive-latex-base
+        #  sudo apt-get install texlive-latex-recommended
+        #  sudo apt-get install texlive-latex-extra
+        #  pacman -S mingw-w64-x86_64-texlive-latex-base mingw-w64-x86_64-texlive-latex-recommended mingw-w64-x86_64-texlive-latex-extra
+        if(GeneratePDFDoc EQUAL ON)
+            set(DOXYGEN_PDF_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile_pdf.in)
+            set(DOXYGEN_PDF_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile_pdf)
 
-        add_custom_target(doc_doxygen_pdf ALL
-            COMMAND make
-            COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/doc/latex ! -name 'refman.pdf' -type f -exec rm  {} +
-            COMMAND mv refman.pdf "JujuBot_uC_A8_${TS}.pdf"
-            DEPENDS doc_doxygen_tex
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/latex
-        )
+            configure_file(${DOXYGEN_PDF_IN} ${DOXYGEN_PDF_OUT} @ONLY)
+
+            add_custom_target( doc_doxygen_tex ALL
+                COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_PDF_OUT}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
+                VERBATIM )
+
+            string(TIMESTAMP TS "%Y%m%d")
+
+            add_custom_target(doc_doxygen_pdf ALL
+                COMMAND make
+                COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/doc/latex ! -name 'refman.pdf' -type f -exec rm  {} +
+                COMMAND mv refman.pdf "JujuBot_uC_A8_${TS}.pdf"
+                DEPENDS doc_doxygen_tex
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/latex
+            )
+        endif()
+    else()
+        message(SEND_ERROR "Doxygen not found. No documentation will be built")
     endif()
 else()
-    message(SEND_ERROR "Doxygen not found. No documentation will be built")
+    message("### USER COMMENT: Docu not generated per option ###")
 endif()
 
 
