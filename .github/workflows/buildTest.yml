@@ -8,14 +8,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - uses: 'Build CMake' # _configureBuildAndTest
-        with:
-          # will set the CC & CXX for cmake
-          cc: gcc
-          cxx: g++
-          build-type: Release
-          # Extra options pass to cmake while configuring project
-         # configure-options: -DCMAKE_C_FLAGS=-w32 -DPNG_INCLUDE=OFF
-          run-test: true
+      
+      - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
+      - run: cd "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
+      - run: cmake ..
+      - run: make 
+      - run: make test
       - run: gcc --version
       - run: python --version
