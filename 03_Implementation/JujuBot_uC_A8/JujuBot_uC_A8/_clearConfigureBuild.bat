@@ -1,6 +1,6 @@
 @echo off
 
-rmdir /s /q "c"
+rmdir /s /q "c/"
 rmdir /s /q "_TestAndSim/c"
 
 rmdir /s /q "build"
