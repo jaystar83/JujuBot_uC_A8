@@ -10,6 +10,8 @@ jobs:
           node-version: '14'
           
       - run: ls
+      - run: cd "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/"
+      - run: ls
       
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: cd "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
