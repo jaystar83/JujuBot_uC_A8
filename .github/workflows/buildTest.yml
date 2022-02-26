@@ -10,7 +10,9 @@ jobs:
           node-version: '14'
           
       - run: ls
-      - run: cd 03_Implementation
+      - run: 
+          cd 03_Implementation
+          ls
       - run: ls
       - run: cd JujuBot_uC_A8
       
