@@ -11,7 +11,7 @@ jobs:
           
       - run: ls
       - run: cd "${{ github.workspace }}/03_Implementation"
-      - run: ls
+      - run: ls "${{ github.workspace }}/03_Implementation"
       - run: cd JujuBot_uC_A8
       
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
