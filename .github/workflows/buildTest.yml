@@ -10,9 +10,7 @@ jobs:
           node-version: '14'
           
       - run: ls
-      - run: 
-          cd 03_Implementation
-          ls
+      - run: cd "${{ github.workspace }}/03_Implementation
       - run: ls
       - run: cd JujuBot_uC_A8
       
