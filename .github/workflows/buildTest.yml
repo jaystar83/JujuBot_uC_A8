@@ -8,7 +8,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: sudo apt-get install doxygen -y
+  #    - run: sudo apt-get install doxygen -y
       
       - run: gcc --version
       - run: python --version
@@ -18,7 +18,7 @@ jobs:
 #      - run: ctest --build-and-test <path-to-source> <path-to-build>
 #      - run: ctest --build-and-test "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" --build-generator "Unix Makefiles"
       
-      - run: cmake -B"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" 
+      - run: cmake -B"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" -GenerateDocu=OFF
       - run: cmake --build "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/_TestAndSim"
