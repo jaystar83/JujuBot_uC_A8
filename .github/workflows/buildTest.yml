@@ -8,13 +8,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-          
-      - run: ls
-      - run: cd "${{ github.workspace }}/03_Implementation"
-      - run: ls "${{ github.workspace }}/03_Implementation"
-      
+      - run: apt-get install doygen -y
+
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
-      - run: cd "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: cmake -B "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8"
       - run: make "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
 #      - run: make test
