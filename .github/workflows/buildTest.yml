@@ -1,5 +1,5 @@
 name: BuildAndTest
-on: [push]
+on: [workflow_dispatch]
 jobs:
   buildAndTest:
     runs-on: ubuntu-latest
