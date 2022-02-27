@@ -12,6 +12,7 @@ jobs:
 
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: cmake -B "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8"
+      - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: make "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
 #      - run: make test
       - run: gcc --version
