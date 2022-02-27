@@ -13,9 +13,10 @@ jobs:
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       
 #      - run: ctest --build-and-test <path-to-source> <path-to-build>
-      - run: ctest --build-and-test "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" --build-generator "Unix Makefiles"
+#      - run: ctest --build-and-test "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" --build-generator "Unix Makefiles"
       
-      - run: cmake --build -B"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" 
+      - run: cmake -B"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" 
+      - run: cmake --build "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/_TestAndSim"
 #      - run: make -f "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/Makefile"
