@@ -1,5 +1,8 @@
 name: BuildAndTest
-on: [push]
+#on: [push]
+on:
+  pull_request:
+    types: [opened, reopened]
 jobs:
   buildAndTest:
     runs-on: ubuntu-latest
