@@ -11,6 +11,10 @@ jobs:
       - run: sudo apt-get install doxygen -y
 
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
+      
+#      - run: ctest --build-and-test <path-to-source> <path-to-build>
+      - run: ctest --build-and-test "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8" "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
+      
       - run: cmake -B "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8"
       - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: make -f "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/Makefile"
