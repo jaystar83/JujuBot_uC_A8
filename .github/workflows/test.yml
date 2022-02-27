@@ -1,5 +1,5 @@
 name: test
-on: [push]
+on: [workflow_dispatch]
 jobs:
   check-gcc-and-python-version:
     runs-on: ubuntu-latest

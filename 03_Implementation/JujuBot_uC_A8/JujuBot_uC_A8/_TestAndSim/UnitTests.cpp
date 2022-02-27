@@ -34,9 +34,10 @@ TEST(sumValues_TestSuit, PassTests)
 
 }
 
-TEST(sumValues_TestSuit, FailTests) 
+/*TEST(sumValues_TestSuit, FailTests) 
 {
     int retVal = sumValues(12,12);
     EXPECT_EQ(retVal, 23);
 
 }
+*/
