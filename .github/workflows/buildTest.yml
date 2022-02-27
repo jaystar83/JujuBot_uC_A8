@@ -20,8 +20,8 @@ jobs:
       
       - run: cmake -DGenerateDocu=OFF -B"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S"${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8"
       - run: cmake --build "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
-      - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
-      - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/_TestAndSim"
+#      - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
+#      - run: ls "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/_TestAndSim"
 #      - run: make -f "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/Makefile"
 #      - run: make test -f "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/Makefile"
 #      - run: make test
