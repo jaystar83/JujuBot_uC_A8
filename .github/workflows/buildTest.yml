@@ -9,7 +9,10 @@ jobs:
         with:
           node-version: '14'
       - run: sudo apt-get install doxygen -y
-
+      
+      - run: gcc --version
+      - run: python --version
+      
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       
 #      - run: ctest --build-and-test <path-to-source> <path-to-build>
@@ -24,5 +27,4 @@ jobs:
 #      - run: make test
       
       - run: "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/_TestAndSim/UnitTests"
-      - run: gcc --version
-      - run: python --version
+
