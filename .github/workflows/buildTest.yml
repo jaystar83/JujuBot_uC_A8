@@ -1,5 +1,5 @@
 name: BuildAndTest
-on: [workflow_dispatch]
+on: [push]
 jobs:
   buildAndTest:
     runs-on: ubuntu-latest
@@ -15,8 +15,8 @@ jobs:
       
       - run: mkdir "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
       - run: cd "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
-      - run: cd "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build/" cmake ..
-      - run: make 
-      - run: make test
+      - run: cmake -B "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build" -S "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8"
+      - run: make "${{ github.workspace }}/03_Implementation/JujuBot_uC_A8/JujuBot_uC_A8/build"
+#      - run: make test
       - run: gcc --version
       - run: python --version
